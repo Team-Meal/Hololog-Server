@@ -30,7 +30,7 @@ A platform that digitalizes the entire school meal process — from meal plannin
 
 | Domain | Description |
 |--------|-------------|
-| `meal-plan` | Monthly meal schedule design and management |
+| `meal` | Monthly meal schedule design and management |
 | `ingredient` | Ingredient inventory and order planning |
 | `budget` | Meal budget management |
 | `supplier` | Supplier info and unit pricing |
@@ -62,11 +62,23 @@ team.nongchun.hororog
 ## Naming Conventions
 
 - **Controller**: `Domain + Controller` (e.g. `MealPlanController`)
-- **Service**: `Domain + Service` (e.g. `MealPlanService`)
+- **Service**: `Verb + Domain + Service` — one class per use case, single `execute()` method (e.g. `CreateMealPlanService`, `DeleteMealPlanService`)
 - **Repository**: `Domain + Repository` (e.g. `MealPlanRepository`)
 - **Entity**: `Domain` (e.g. `MealPlan`)
 - **Request DTO**: `Verb + Domain + Request` (e.g. `CreateMealPlanRequest`)
 - **Response DTO**: `Domain + Response` (e.g. `MealPlanResponse`)
+
+```kotlin
+@Service
+@Transactional
+class CreateMealPlanService(
+    private val mealPlanRepository: MealPlanRepository,
+) {
+    fun execute(request: CreateMealPlanRequest): MealPlanResponse {
+        // ...
+    }
+}
+```
 
 ## Transaction Management
 
