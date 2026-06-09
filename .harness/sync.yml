@@ -1,0 +1,22 @@
+groups:
+  - claude
+  - codex
+  - gemini
+
+overrides:
+  claude/hooks/dispatcher: true
+  claude/settings: true
+  claude/hooks/secret-guard: true
+  claude/hooks/command-guard: true
+  claude/hooks/ktlint: true
+  claude/hooks/kotest: true
+  codex/hooks/dispatcher: true
+  codex/hooks-json: true
+  codex/hooks/secret-guard: true
+  codex/hooks/command-guard: true
+  codex/hooks/ktlint: true
+  codex/hooks/kotest: true
+
+branch_prefix: update/
+base_branch: develop
+language: ko
