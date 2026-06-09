@@ -40,40 +40,22 @@
 
 ## 아키텍처
 
-헥사고날 아키텍처를 사용합니다.
+3계층 아키텍처를 사용합니다.
 
-### 의존성 방향
-
-```
-adapter/in → port/in → service → port/out → adapter/out
-```
-
-- `domain/`은 JPA, Spring 등 인프라에 의존하지 않습니다.
-- `service`는 `port/out` 인터페이스만 알며 JPA에 직접 접근하지 않습니다.
-- `JpaEntity ↔ Domain` 변환은 Kotlin 확장 함수로 처리합니다.
-
-### 패키지 구조
+### 레이어 흐름
 
 ```
-team.nongchun.hororog
-├── domain/               # 도메인 모델 (순수 Kotlin)
-├── port/
-│   ├── in/               # UseCase 인터페이스
-│   └── out/              # PersistencePort 인터페이스
-├── service/              # 비즈니스 로직
-└── adapter/
-    ├── in/               # WebAdapter (Controller)
-    └── out/
-        └── persistence/  # JpaEntity, JpaRepository, PersistenceAdapter
+Controller → Service → Repository
 ```
 
 ## 네이밍 컨벤션
 
-- **UseCase 인터페이스**: `동사 + 도메인 + UseCase` (예: `CreateMealPlanUseCase`)
-- **PersistencePort 인터페이스**: `동사 + 도메인 + Port` (예: `SaveMealPlanPort`)
-- **Service 클래스**: `도메인 + Service` (예: `MealPlanService`)
-- **JpaEntity**: `도메인 + JpaEntity` (예: `MealPlanJpaEntity`)
-- **WebAdapter**: `도메인 + WebAdapter` (예: `MealPlanWebAdapter`)
+- **Controller**: `도메인 + Controller` (예: `MealPlanController`)
+- **Service**: `도메인 + Service` (예: `MealPlanService`)
+- **Repository**: `도메인 + Repository` (예: `MealPlanRepository`)
+- **Entity**: `도메인` (예: `MealPlan`)
+- **Request DTO**: `동사 + 도메인 + Request` (예: `CreateMealPlanRequest`)
+- **Response DTO**: `도메인 + Response` (예: `MealPlanResponse`)
 
 ## 트랜잭션 관리
 
@@ -97,12 +79,9 @@ team.nongchun.hororog
 
 ## 신규 기능 체크리스트
 
-- [ ] 도메인 모델 생성 (`domain/`)
-- [ ] UseCase 인터페이스 생성 (`port/in/`)
-- [ ] PersistencePort 인터페이스 생성 (`port/out/`)
-- [ ] Service 구현체 생성 (`service/`)
-- [ ] JpaEntity 생성 (`adapter/out/persistence/entity/`)
-- [ ] JpaRepository 생성 (`adapter/out/persistence/repository/`)
-- [ ] PersistenceAdapter 생성 (`adapter/out/persistence/`)
-- [ ] WebAdapter 생성 (`adapter/in/`)
+- [ ] Entity 생성 (`entity/`)
+- [ ] Repository 생성 (`repository/`)
+- [ ] Service 생성 (`service/`)
+- [ ] Controller 생성 (`controller/`)
+- [ ] Request/Response DTO 생성 (`dto/`)
 - [ ] KtLint 포맷 적용
