@@ -88,6 +88,67 @@ Format: `type(scope): Korean description`
 
 - Description in Korean, no period, noun ending, under 50 characters
 
+## Code Conventions
+
+### Kotlin
+
+- Use `data class` for DTOs, avoid mutable `var` — prefer `val`
+- Use `companion object` for constants and factory methods
+- Prefer named arguments for constructors with 3+ parameters
+- Use `?.let`, `?.run` for null-safe chaining — avoid `!!` unless guaranteed non-null
+- Use `enum class` for fixed status values (e.g. meal category, order status)
+
+### Entity
+
+- Use `@Column(nullable = false)` explicitly — never rely on defaults
+- Audit fields (`createdAt`, `updatedAt`) go in a `BaseEntity` superclass with `@MappedSuperclass`
+- Avoid bidirectional relationships unless necessary — use unidirectional with `@ManyToOne`
+- Use `@Enumerated(EnumType.STRING)` for enum columns
+
+```kotlin
+@MappedSuperclass
+abstract class BaseEntity {
+    @CreatedDate
+    val createdAt: LocalDateTime = LocalDateTime.now()
+
+    @LastModifiedDate
+    var updatedAt: LocalDateTime = LocalDateTime.now()
+}
+```
+
+### DTO
+
+- Separate Request and Response DTOs — never reuse the same class for both
+- Use `from()` companion factory on Response DTOs to convert from entity
+
+```kotlin
+data class MealPlanResponse(
+    val id: Long,
+    val name: String,
+) {
+    companion object {
+        fun from(entity: MealPlan) = MealPlanResponse(
+            id = entity.id,
+            name = entity.name,
+        )
+    }
+}
+```
+
+### Exception Handling
+
+- Define custom exceptions per domain (e.g. `MealPlanNotFoundException`)
+- Handle globally via `@RestControllerAdvice`
+
+```kotlin
+class MealPlanNotFoundException : RuntimeException("Meal plan not found")
+```
+
+### Logging
+
+- Use SLF4J via `private val logger = LoggerFactory.getLogger(javaClass)`
+- Log at `info` for key business events, `error` for exceptions with stack trace
+
 ## New Feature Checklist
 
 - [ ] Create Entity (`entity/`)
