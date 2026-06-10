@@ -7,5 +7,5 @@ import org.springframework.boot.runApplication
 class HororogApplication
 
 fun main(args: Array<String>) {
-	runApplication<HororogApplication>(*args)
+    runApplication<HororogApplication>(*args)
 }
