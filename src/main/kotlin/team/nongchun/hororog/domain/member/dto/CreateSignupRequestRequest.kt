@@ -1,8 +1,10 @@
 package team.nongchun.hororog.domain.member.dto
 
-import com.fasterxml.jackson.annotation.JsonProperty
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Size
 
 data class CreateSignupRequestRequest(
-    @JsonProperty("license_number")
-    val licenseNumber: Long,
+    @field:NotBlank
+    @field:Size(max = 20)
+    val licenseNumber: String,
 )

@@ -22,8 +22,8 @@ class NutritionistSignupRequest(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     val member: Member,
-    @Column(nullable = false)
-    var licenseNumber: Long,
+    @Column(nullable = false, length = 20)
+    val licenseNumber: String,
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     var status: SignupStatus,

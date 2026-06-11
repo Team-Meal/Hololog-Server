@@ -5,7 +5,7 @@ import team.nongchun.hororog.domain.member.entity.SignupStatus
 
 data class SignupRequestResponse(
     val requestId: Long,
-    val licenseNumber: Long,
+    val licenseNumber: String,
     val status: SignupStatus,
 ) {
     companion object {

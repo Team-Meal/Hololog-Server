@@ -7,6 +7,7 @@ import team.nongchun.hororog.domain.member.dto.SignupRequestResponse
 import team.nongchun.hororog.domain.member.entity.NutritionistSignupRequest
 import team.nongchun.hororog.domain.member.entity.SignupStatus
 import team.nongchun.hororog.domain.member.exception.MemberNotFoundException
+import team.nongchun.hororog.domain.member.exception.SignupRequestAlreadyPendingException
 import team.nongchun.hororog.domain.member.repository.MemberRepository
 import team.nongchun.hororog.domain.member.repository.NutritionistSignupRequestRepository
 import team.nongchun.hororog.global.auth.AuthenticationHolder
@@ -24,6 +25,9 @@ class CreateSignupRequestServiceImpl(
             memberRepository
                 .findById(userId)
                 .orElseThrow { MemberNotFoundException() }
+        if (nutritionistSignupRequestRepository.existsByMemberIdAndStatus(userId, SignupStatus.PENDING)) {
+            throw SignupRequestAlreadyPendingException()
+        }
         val saved =
             nutritionistSignupRequestRepository.save(
                 NutritionistSignupRequest(
