@@ -21,18 +21,17 @@ class JwtProvider(
 
     companion object {
         private const val ROLE_CLAIM = "role"
+        private const val TYPE_CLAIM = "typ"
     }
 
     fun createAccessToken(
         userId: Long,
         role: Role,
-    ): String = createToken(userId, role, jwtProperties.accessExpiration)
+    ): String = createToken(userId, role, jwtProperties.accessExpiration, TokenType.ACCESS)
 
-    fun createRefreshToken(userId: Long): String = createToken(userId, null, jwtProperties.refreshExpiration)
+    fun createRefreshToken(userId: Long): String = createToken(userId, null, jwtProperties.refreshExpiration, TokenType.REFRESH)
 
     fun getUserId(token: String): Long = parseClaims(token).subject.toLong()
-
-    fun getRole(token: String): Role = Role.valueOf(parseClaims(token).get(ROLE_CLAIM, String::class.java))
 
     fun getExpiration(token: String): LocalDateTime =
         parseClaims(token)
@@ -41,10 +40,18 @@ class JwtProvider(
             .atZone(ZoneId.systemDefault())
             .toLocalDateTime()
 
-    fun validateToken(token: String): Boolean =
+    fun validateToken(
+        token: String,
+        expectedType: TokenType,
+    ): Boolean =
         try {
-            parseClaims(token)
-            true
+            val type = parseClaims(token).get(TYPE_CLAIM, String::class.java)
+            if (type == expectedType.name) {
+                true
+            } else {
+                logger.info("토큰 종류 불일치: expected={}, actual={}", expectedType.name, type)
+                false
+            }
         } catch (e: JwtException) {
             logger.info("유효하지 않은 JWT: {}", e.message)
             false
@@ -57,12 +64,14 @@ class JwtProvider(
         userId: Long,
         role: Role?,
         expiration: Long,
+        type: TokenType,
     ): String {
         val now = Date()
         val expiry = Date(now.time + expiration)
         return Jwts
             .builder()
             .subject(userId.toString())
+            .claim(TYPE_CLAIM, type.name)
             .apply { role?.let { claim(ROLE_CLAIM, it.name) } }
             .issuedAt(now)
             .expiration(expiry)
