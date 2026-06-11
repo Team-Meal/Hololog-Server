@@ -48,7 +48,7 @@ class SigninControllerTest {
         saveMember()
 
         mockMvc
-            .post("/signin") {
+            .post("/auth/signin") {
                 contentType = MediaType.APPLICATION_JSON
                 content = """{ "email": "nutritionist@hororog.team", "password": "password1234" }"""
             }.andExpect {
@@ -66,7 +66,7 @@ class SigninControllerTest {
         saveMember()
 
         mockMvc
-            .post("/signin") {
+            .post("/auth/signin") {
                 contentType = MediaType.APPLICATION_JSON
                 content = """{ "email": "nutritionist@hororog.team", "password": "wrong-password" }"""
             }.andExpect {

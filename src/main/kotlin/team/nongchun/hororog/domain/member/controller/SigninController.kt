@@ -12,7 +12,7 @@ import team.nongchun.hororog.domain.member.service.SigninService
 class SigninController(
     private val signinService: SigninService,
 ) {
-    @PostMapping("/signin")
+    @PostMapping("/auth/signin")
     fun signin(
         @Valid @RequestBody request: SigninRequest,
     ): SigninResponse = signinService.execute(request)

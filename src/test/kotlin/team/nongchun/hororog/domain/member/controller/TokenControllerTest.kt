@@ -54,7 +54,7 @@ class TokenControllerTest {
             .willReturn(Optional.of(RefreshToken(member.id, refreshToken, 1_209_600L)))
 
         mockMvc
-            .post("/reissue") {
+            .post("/auth/reissue") {
                 header("Refresh-Token", refreshToken)
             }.andExpect {
                 status { isOk() }
@@ -71,11 +71,38 @@ class TokenControllerTest {
         given(refreshTokenRepository.findById(member.id)).willReturn(Optional.empty())
 
         mockMvc
-            .post("/reissue") {
+            .post("/auth/reissue") {
                 header("Refresh-Token", refreshToken)
             }.andExpect {
                 status { isUnauthorized() }
                 jsonPath("$.status") { value(401) }
+            }
+    }
+
+    @Test
+    fun `access 토큰으로는 재발급할 수 없다`() {
+        val member = saveMember()
+        val accessToken = jwtProvider.createAccessToken(member.id, member.role)
+
+        mockMvc
+            .post("/auth/reissue") {
+                header("Refresh-Token", accessToken)
+            }.andExpect {
+                status { isUnauthorized() }
+                jsonPath("$.status") { value(401) }
+            }
+    }
+
+    @Test
+    fun `refresh 토큰으로는 보호된 API에 접근할 수 없다`() {
+        val member = saveMember()
+        val refreshToken = jwtProvider.createRefreshToken(member.id)
+
+        mockMvc
+            .post("/auth/logout") {
+                header(HttpHeaders.AUTHORIZATION, "Bearer $refreshToken")
+            }.andExpect {
+                status { is4xxClientError() }
             }
     }
 
@@ -85,7 +112,7 @@ class TokenControllerTest {
         val accessToken = jwtProvider.createAccessToken(member.id, member.role)
 
         mockMvc
-            .post("/logout") {
+            .post("/auth/logout") {
                 header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
             }.andExpect {
                 status { isNoContent() }
@@ -97,7 +124,7 @@ class TokenControllerTest {
     @Test
     fun `토큰 없이 로그아웃하면 인증 오류로 막힌다`() {
         mockMvc
-            .post("/logout") {
+            .post("/auth/logout") {
             }.andExpect {
                 status { is4xxClientError() }
             }
