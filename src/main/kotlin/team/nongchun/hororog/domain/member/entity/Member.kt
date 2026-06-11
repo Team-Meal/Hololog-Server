@@ -17,7 +17,7 @@ class Member(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
     @Column(nullable = false, unique = true, length = 255)
-    var email: String,
+    val email: String,
     @Column(nullable = false, length = 255)
     var password: String,
     @Column(nullable = false, length = 50)
