@@ -40,10 +40,10 @@ class SignupServiceTest :
             When("회원가입을 실행하면") {
                 signupService.execute(request)
 
-                Then("NUTRITIONIST 역할의 회원이 암호화된 비밀번호로 저장된다") {
+                Then("PENDING_NUTRITIONIST 역할의 회원이 암호화된 비밀번호로 저장된다") {
                     verify(exactly = 1) { memberRepository.save(any()) }
                     savedSlot.captured.email shouldBe request.email
-                    savedSlot.captured.role shouldBe Role.NUTRITIONIST
+                    savedSlot.captured.role shouldBe Role.PENDING_NUTRITIONIST
                     savedSlot.captured.password shouldBe "encoded-password"
                 }
             }

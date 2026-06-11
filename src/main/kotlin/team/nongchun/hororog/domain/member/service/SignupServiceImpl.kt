@@ -25,7 +25,7 @@ class SignupServiceImpl(
                 password = requireNotNull(passwordEncoder.encode(request.password)),
                 name = request.name,
                 schoolName = request.schoolName,
-                role = Role.NUTRITIONIST,
+                role = Role.PENDING_NUTRITIONIST,
             ),
         )
     }

@@ -26,7 +26,7 @@ class AuthControllerTest
         private val passwordEncoder: PasswordEncoder,
     ) {
         @Test
-        fun `유효한 요청이면 204를 반환하고 NUTRITIONIST 회원을 저장한다`() {
+        fun `유효한 요청이면 204를 반환하고 PENDING_NUTRITIONIST 회원을 저장한다`() {
             val body =
                 """
                 {
@@ -49,7 +49,7 @@ class AuthControllerTest
             assertEquals(1, saved.size)
             with(saved.first()) {
                 assertEquals("nutritionist@hororog.team", email)
-                assertEquals(Role.NUTRITIONIST, role)
+                assertEquals(Role.PENDING_NUTRITIONIST, role)
                 assertTrue(password != "password1234", "비밀번호가 암호화되어 저장되어야 한다")
             }
         }

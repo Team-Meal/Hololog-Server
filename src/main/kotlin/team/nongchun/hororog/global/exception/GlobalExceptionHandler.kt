@@ -10,6 +10,9 @@ import team.nongchun.hororog.domain.member.exception.EmailAlreadyExistsException
 import team.nongchun.hororog.domain.member.exception.InvalidCredentialsException
 import team.nongchun.hororog.domain.member.exception.InvalidTokenException
 import team.nongchun.hororog.domain.member.exception.MemberNotFoundException
+import team.nongchun.hororog.domain.member.exception.SignupRequestAlreadyPendingException
+import team.nongchun.hororog.domain.member.exception.SignupRequestAlreadyProcessedException
+import team.nongchun.hororog.domain.member.exception.SignupRequestNotFoundException
 
 @RestControllerAdvice
 class GlobalExceptionHandler {
@@ -37,6 +40,24 @@ class GlobalExceptionHandler {
     fun handleInvalidToken(e: InvalidTokenException): ResponseEntity<ErrorResponse> {
         logger.info("토큰 검증 실패: {}", e.message)
         return toResponse(HttpStatus.UNAUTHORIZED, e.message)
+    }
+
+    @ExceptionHandler(SignupRequestAlreadyPendingException::class)
+    fun handleSignupRequestAlreadyPending(e: SignupRequestAlreadyPendingException): ResponseEntity<ErrorResponse> {
+        logger.info("가입 요청 중복 제출: {}", e.message)
+        return toResponse(HttpStatus.CONFLICT, e.message)
+    }
+
+    @ExceptionHandler(SignupRequestNotFoundException::class)
+    fun handleSignupRequestNotFound(e: SignupRequestNotFoundException): ResponseEntity<ErrorResponse> {
+        logger.info("가입 요청 조회 실패: {}", e.message)
+        return toResponse(HttpStatus.NOT_FOUND, e.message)
+    }
+
+    @ExceptionHandler(SignupRequestAlreadyProcessedException::class)
+    fun handleSignupRequestAlreadyProcessed(e: SignupRequestAlreadyProcessedException): ResponseEntity<ErrorResponse> {
+        logger.info("처리 완료된 가입 요청 재처리 시도: {}", e.message)
+        return toResponse(HttpStatus.CONFLICT, e.message)
     }
 
     @ExceptionHandler(MethodArgumentNotValidException::class)
