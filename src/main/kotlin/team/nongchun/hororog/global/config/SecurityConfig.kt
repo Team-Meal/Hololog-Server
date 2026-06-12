@@ -26,7 +26,14 @@ class SecurityConfig(
 ) {
     companion object {
         // 와일드카드 대신 정확한 경로만 나열한다 — /auth 하위에 보호가 필요한 엔드포인트가 추가돼도 노출되지 않도록.
-        private val PUBLIC_ENDPOINTS = arrayOf("/auth/signup", "/auth/signin", "/auth/reissue")
+        private val PUBLIC_ENDPOINTS =
+            arrayOf(
+                "/auth/signup",
+                "/auth/signin",
+                "/auth/reissue",
+                "/swagger-ui/**",
+                "/v3/api-docs/**",
+            )
     }
 
     @Bean
@@ -46,9 +53,7 @@ class SecurityConfig(
             .authorizeHttpRequests {
                 it.requestMatchers(*PUBLIC_ENDPOINTS).permitAll()
                 it.requestMatchers("/auth/logout").authenticated()
-                it
-                    .requestMatchers("/auth/signup-requests/*/approve", "/auth/signup-requests/*/reject")
-                    .hasRole(Role.ADMIN.name)
+                it.requestMatchers("/admin/**").hasRole(Role.ADMIN.name)
                 it.requestMatchers(HttpMethod.POST, "/auth/signup-requests").hasRole(Role.PENDING_NUTRITIONIST.name)
                 // 승인 전(PENDING_NUTRITIONIST) 회원은 그 외 API에 접근할 수 없다.
                 it.anyRequest().hasAnyRole(Role.NUTRITIONIST.name, Role.ADMIN.name)
