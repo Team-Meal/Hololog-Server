@@ -26,7 +26,14 @@ class SecurityConfig(
 ) {
     companion object {
         // 와일드카드 대신 정확한 경로만 나열한다 — /auth 하위에 보호가 필요한 엔드포인트가 추가돼도 노출되지 않도록.
-        private val PUBLIC_ENDPOINTS = arrayOf("/auth/signup", "/auth/signin", "/auth/reissue")
+        private val PUBLIC_ENDPOINTS =
+            arrayOf(
+                "/auth/signup",
+                "/auth/signin",
+                "/auth/reissue",
+                "/swagger-ui/**",
+                "/v3/api-docs/**",
+            )
     }
 
     @Bean
