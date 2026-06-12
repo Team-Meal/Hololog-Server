@@ -11,8 +11,8 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
-import team.nongchun.hororog.global.common.QuantityUnit
 import team.nongchun.hororog.domain.ingredient.entity.Ingredient
+import team.nongchun.hororog.global.common.QuantityUnit
 
 @Entity
 @Table(name = "meal_ingredient")

@@ -11,9 +11,9 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
-import java.time.LocalDateTime
-import team.nongchun.hororog.global.common.BaseEntity
 import team.nongchun.hororog.domain.member.entity.Member
+import team.nongchun.hororog.global.common.BaseEntity
+import java.time.LocalDateTime
 
 @Entity
 @Table(name = "meal")

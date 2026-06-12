@@ -1,0 +1,12 @@
+package team.nongchun.hororog.domain.member.repository
+
+import org.springframework.data.jpa.repository.JpaRepository
+import team.nongchun.hororog.domain.member.entity.NutritionistSignupRequest
+import team.nongchun.hororog.domain.member.entity.SignupStatus
+
+interface NutritionistSignupRequestRepository : JpaRepository<NutritionistSignupRequest, Long> {
+    fun existsByMemberIdAndStatus(
+        memberId: Long,
+        status: SignupStatus,
+    ): Boolean
+}
