@@ -46,8 +46,10 @@ class SecurityConfig(
             .authorizeHttpRequests {
                 it.requestMatchers(*PUBLIC_ENDPOINTS).permitAll()
                 it.requestMatchers("/auth/logout").authenticated()
-                it.requestMatchers("/signup-requests/*/approve", "/signup-requests/*/reject").hasRole(Role.ADMIN.name)
-                it.requestMatchers(HttpMethod.POST, "/signup-requests").hasRole(Role.PENDING_NUTRITIONIST.name)
+                it
+                    .requestMatchers("/auth/signup-requests/*/approve", "/auth/signup-requests/*/reject")
+                    .hasRole(Role.ADMIN.name)
+                it.requestMatchers(HttpMethod.POST, "/auth/signup-requests").hasRole(Role.PENDING_NUTRITIONIST.name)
                 // 승인 전(PENDING_NUTRITIONIST) 회원은 그 외 API에 접근할 수 없다.
                 it.anyRequest().hasAnyRole(Role.NUTRITIONIST.name, Role.ADMIN.name)
             }.addFilterBefore(
