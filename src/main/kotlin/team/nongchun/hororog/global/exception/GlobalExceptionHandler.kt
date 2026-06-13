@@ -6,6 +6,9 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import team.nongchun.hororog.domain.ingredient.exception.IngredientNotFoundException
+import team.nongchun.hororog.domain.ingredient.exception.IngredientPlanNotFoundException
+import team.nongchun.hororog.domain.ingredient.exception.InvalidQuantityUnitException
 import team.nongchun.hororog.domain.member.exception.EmailAlreadyExistsException
 import team.nongchun.hororog.domain.member.exception.InvalidCredentialsException
 import team.nongchun.hororog.domain.member.exception.InvalidTokenException
@@ -58,6 +61,24 @@ class GlobalExceptionHandler {
     fun handleSignupRequestAlreadyProcessed(e: SignupRequestAlreadyProcessedException): ResponseEntity<ErrorResponse> {
         logger.info("처리 완료된 가입 요청 재처리 시도: {}", e.message)
         return toResponse(HttpStatus.CONFLICT, e.message)
+    }
+
+    @ExceptionHandler(IngredientNotFoundException::class)
+    fun handleIngredientNotFound(e: IngredientNotFoundException): ResponseEntity<ErrorResponse> {
+        logger.info("식자재 조회 실패: {}", e.message)
+        return toResponse(HttpStatus.NOT_FOUND, e.message)
+    }
+
+    @ExceptionHandler(IngredientPlanNotFoundException::class)
+    fun handleIngredientPlanNotFound(e: IngredientPlanNotFoundException): ResponseEntity<ErrorResponse> {
+        logger.info("식자재 계획표 조회 실패: {}", e.message)
+        return toResponse(HttpStatus.NOT_FOUND, e.message)
+    }
+
+    @ExceptionHandler(InvalidQuantityUnitException::class)
+    fun handleInvalidQuantityUnit(e: InvalidQuantityUnitException): ResponseEntity<ErrorResponse> {
+        logger.info("잘못된 단위 입력: {}", e.message)
+        return toResponse(HttpStatus.BAD_REQUEST, e.message)
     }
 
     @ExceptionHandler(MethodArgumentNotValidException::class)
