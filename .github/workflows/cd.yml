@@ -56,6 +56,12 @@ jobs:
     needs: docker
     runs-on: self-hosted
     if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      packages: read
+    concurrency:
+      group: production-deploy
+      cancel-in-progress: false
 
     steps:
       - name: Checkout
@@ -80,6 +86,11 @@ jobs:
 
       - name: Deploy
         run: APP_IMAGE=${{ steps.img.outputs.image }} docker compose -f docker-compose.prod.yml up -d
+
+      - name: Verify deployment
+        run: |
+          sleep 20
+          docker compose -f docker-compose.prod.yml ps | grep "app" | grep -q "running" || { echo "App container not running"; exit 1; }
 
       - name: Clean up unused images
         run: docker image prune -f
