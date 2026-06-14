@@ -11,7 +11,7 @@ import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
 import team.nongchun.hororog.domain.member.entity.Member
 import team.nongchun.hororog.global.common.BaseEntity
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 @Entity
 @Table(name = "budget")
@@ -29,7 +29,7 @@ class Budget(
     @Column(nullable = false)
     var usedBudget: Int,
     @Column(nullable = false)
-    var startDate: LocalDateTime,
+    var startDate: LocalDate,
     @Column(nullable = false)
-    var endDate: LocalDateTime,
+    var endDate: LocalDate,
 ) : BaseEntity()

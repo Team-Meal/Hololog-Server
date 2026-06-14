@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import team.nongchun.hororog.domain.budget.exception.BudgetNotFoundException
+import team.nongchun.hororog.domain.budget.exception.InvalidBudgetException
 import team.nongchun.hororog.domain.diet.exception.DietNotFoundException
 import team.nongchun.hororog.domain.ingredient.exception.IngredientNotFoundException
 import team.nongchun.hororog.domain.ingredient.exception.IngredientPlanNotFoundException
@@ -21,6 +23,18 @@ import team.nongchun.hororog.domain.member.exception.SignupRequestNotFoundExcept
 @RestControllerAdvice
 class GlobalExceptionHandler {
     private val logger = LoggerFactory.getLogger(javaClass)
+
+    @ExceptionHandler(BudgetNotFoundException::class)
+    fun handleBudgetNotFound(e: BudgetNotFoundException): ResponseEntity<ErrorResponse> {
+        logger.info("예산 조회 실패: {}", e.message)
+        return toResponse(HttpStatus.NOT_FOUND, e.message)
+    }
+
+    @ExceptionHandler(InvalidBudgetException::class)
+    fun handleInvalidBudget(e: InvalidBudgetException): ResponseEntity<ErrorResponse> {
+        logger.info("잘못된 예산 입력: {}", e.message)
+        return toResponse(HttpStatus.BAD_REQUEST, e.message)
+    }
 
     @ExceptionHandler(DietNotFoundException::class)
     fun handleDietNotFound(e: DietNotFoundException): ResponseEntity<ErrorResponse> {
