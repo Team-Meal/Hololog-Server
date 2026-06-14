@@ -1,0 +1,30 @@
+# Build outputs
+build/
+bin/
+out/
+
+# Gradle
+.gradle/
+
+# Kotlin
+.kotlin/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Docs & tooling
+HELP.md
+CLAUDE.md
+.harness/
+
+# OS
+.DS_Store
