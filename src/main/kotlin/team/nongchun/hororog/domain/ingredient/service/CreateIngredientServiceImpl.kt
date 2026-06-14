@@ -24,11 +24,8 @@ class CreateIngredientServiceImpl(
                 .findById(authenticationHolder.getCurrentUserId())
                 .orElseThrow { MemberNotFoundException() }
         val unit =
-            try {
-                QuantityUnit.valueOf(request.unit.uppercase())
-            } catch (e: IllegalArgumentException) {
-                throw InvalidQuantityUnitException()
-            }
+            QuantityUnit.fromOrNull(request.unit)
+                ?: throw InvalidQuantityUnitException()
         ingredientRepository.save(
             Ingredient(
                 member = member,

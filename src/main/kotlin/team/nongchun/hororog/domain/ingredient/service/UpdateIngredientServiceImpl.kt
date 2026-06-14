@@ -29,22 +29,13 @@ class UpdateIngredientServiceImpl(
                 .orElseThrow { MemberNotFoundException() }
                 .schoolName
         val ingredient =
-            ingredientRepository
-                .findById(ingredientId)
-                .orElseThrow { IngredientNotFoundException() }
-        if (ingredient.member.schoolName != schoolName) {
-            throw IngredientNotFoundException()
-        }
+            ingredientRepository.findByIdAndMemberSchoolName(ingredientId, schoolName)
+                ?: throw IngredientNotFoundException()
 
         request.name?.let { ingredient.name = it }
         request.quantity?.let { ingredient.quantity = it }
         request.unit?.let {
-            ingredient.unit =
-                try {
-                    QuantityUnit.valueOf(it.uppercase())
-                } catch (e: IllegalArgumentException) {
-                    throw InvalidQuantityUnitException()
-                }
+            ingredient.unit = QuantityUnit.fromOrNull(it) ?: throw InvalidQuantityUnitException()
         }
         request.expirationDate?.let { ingredient.expirationDate = it }
         request.category?.let { ingredient.category = it }

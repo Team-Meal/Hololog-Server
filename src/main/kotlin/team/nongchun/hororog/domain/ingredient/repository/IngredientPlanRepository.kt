@@ -5,4 +5,9 @@ import team.nongchun.hororog.domain.ingredient.entity.IngredientPlan
 
 interface IngredientPlanRepository : JpaRepository<IngredientPlan, Long> {
     fun findAllByMemberSchoolName(schoolName: String): List<IngredientPlan>
+
+    fun findByIdAndMemberSchoolName(
+        id: Long,
+        schoolName: String,
+    ): IngredientPlan?
 }

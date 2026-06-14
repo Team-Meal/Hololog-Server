@@ -23,12 +23,8 @@ class GetIngredientServiceImpl(
                 .orElseThrow { MemberNotFoundException() }
                 .schoolName
         val ingredient =
-            ingredientRepository
-                .findById(ingredientId)
-                .orElseThrow { IngredientNotFoundException() }
-        if (ingredient.member.schoolName != schoolName) {
-            throw IngredientNotFoundException()
-        }
+            ingredientRepository.findByIdAndMemberSchoolName(ingredientId, schoolName)
+                ?: throw IngredientNotFoundException()
         return IngredientResponse.from(ingredient)
     }
 }

@@ -27,12 +27,8 @@ class UpdateIngredientPlanServiceImpl(
                 .orElseThrow { MemberNotFoundException() }
                 .schoolName
         val plan =
-            ingredientPlanRepository
-                .findById(planId)
-                .orElseThrow { IngredientPlanNotFoundException() }
-        if (plan.member.schoolName != schoolName) {
-            throw IngredientPlanNotFoundException()
-        }
+            ingredientPlanRepository.findByIdAndMemberSchoolName(planId, schoolName)
+                ?: throw IngredientPlanNotFoundException()
 
         request.title?.let { plan.title = it }
         request.startDate?.let { plan.startDate = it }

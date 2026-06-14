@@ -22,12 +22,8 @@ class DeleteIngredientPlanServiceImpl(
                 .orElseThrow { MemberNotFoundException() }
                 .schoolName
         val plan =
-            ingredientPlanRepository
-                .findById(planId)
-                .orElseThrow { IngredientPlanNotFoundException() }
-        if (plan.member.schoolName != schoolName) {
-            throw IngredientPlanNotFoundException()
-        }
+            ingredientPlanRepository.findByIdAndMemberSchoolName(planId, schoolName)
+                ?: throw IngredientPlanNotFoundException()
         ingredientPlanRepository.delete(plan)
     }
 }
