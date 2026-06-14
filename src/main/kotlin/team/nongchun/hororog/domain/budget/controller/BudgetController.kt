@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import team.nongchun.hororog.domain.budget.dto.BudgetListResponse
 import team.nongchun.hororog.domain.budget.dto.BudgetResponse
-import team.nongchun.hororog.domain.budget.dto.BudgetUpdateResponse
 import team.nongchun.hororog.domain.budget.dto.CreateBudgetRequest
 import team.nongchun.hororog.domain.budget.dto.UpdateBudgetRequest
+import team.nongchun.hororog.domain.budget.dto.UpdateBudgetResponse
 import team.nongchun.hororog.domain.budget.service.CreateBudgetService
 import team.nongchun.hororog.domain.budget.service.DeleteBudgetService
 import team.nongchun.hororog.domain.budget.service.GetBudgetListService
@@ -80,7 +80,7 @@ class BudgetController(
     fun update(
         @PathVariable budgetId: Long,
         @Valid @RequestBody request: UpdateBudgetRequest,
-    ): BudgetUpdateResponse = updateBudgetService.execute(budgetId, request)
+    ): UpdateBudgetResponse = updateBudgetService.execute(budgetId, request)
 
     @Operation(summary = "예산 삭제")
     @ApiResponses(

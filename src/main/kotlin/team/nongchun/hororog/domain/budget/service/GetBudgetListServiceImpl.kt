@@ -22,7 +22,7 @@ class GetBudgetListServiceImpl(
                 .orElseThrow { MemberNotFoundException() }
                 .schoolName
         return budgetRepository
-            .findAllByMemberSchoolName(schoolName)
+            .findAllByMemberSchoolNameOrderByIdDesc(schoolName)
             .map(BudgetListResponse::from)
     }
 }

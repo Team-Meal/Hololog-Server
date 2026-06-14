@@ -53,7 +53,6 @@ class UpdateBudgetServiceTest :
             every { authenticationHolder.getCurrentUserId() } returns member.id
             every { memberRepository.findById(member.id) } returns Optional.of(member)
             every { budgetRepository.findByIdAndMemberSchoolName(10L, "농촌초등학교") } returns budget
-            every { budgetRepository.saveAndFlush(budget) } returns budget
 
             When("전달된 필드만 수정하면") {
                 val response =
@@ -72,7 +71,7 @@ class UpdateBudgetServiceTest :
                     budget.usedBudget shouldBe 200_000
                     budget.startDate shouldBe LocalDate.of(2026, 6, 1)
                     budget.endDate shouldBe LocalDate.of(2026, 6, 30)
-                    verify(exactly = 1) { budgetRepository.saveAndFlush(budget) }
+                    verify(exactly = 0) { budgetRepository.saveAndFlush(any()) }
                 }
             }
         }

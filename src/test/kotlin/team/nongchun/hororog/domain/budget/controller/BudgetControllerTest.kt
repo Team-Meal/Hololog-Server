@@ -106,8 +106,8 @@ class BudgetControllerTest
                     header(HttpHeaders.AUTHORIZATION, "Bearer ${accessToken(member)}")
                 }.andExpect {
                     status { isOk() }
-                    jsonPath("$[0].title") { value("내 예산") }
-                    jsonPath("$[1].title") { value("같은 학교 예산") }
+                    jsonPath("$[0].title") { value("같은 학교 예산") }
+                    jsonPath("$[1].title") { value("내 예산") }
                     jsonPath("$.length()") { value(2) }
                 }
         }

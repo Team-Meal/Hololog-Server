@@ -2,8 +2,8 @@ package team.nongchun.hororog.domain.budget.service
 
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import team.nongchun.hororog.domain.budget.dto.BudgetUpdateResponse
 import team.nongchun.hororog.domain.budget.dto.UpdateBudgetRequest
+import team.nongchun.hororog.domain.budget.dto.UpdateBudgetResponse
 import team.nongchun.hororog.domain.budget.exception.BudgetNotFoundException
 import team.nongchun.hororog.domain.budget.repository.BudgetRepository
 import team.nongchun.hororog.domain.member.exception.MemberNotFoundException
@@ -20,7 +20,7 @@ class UpdateBudgetServiceImpl(
     override fun execute(
         budgetId: Long,
         request: UpdateBudgetRequest,
-    ): BudgetUpdateResponse {
+    ): UpdateBudgetResponse {
         val schoolName =
             memberRepository
                 .findById(authenticationHolder.getCurrentUserId())
@@ -44,6 +44,6 @@ class UpdateBudgetServiceImpl(
         budget.startDate = startDate
         budget.endDate = endDate
 
-        return BudgetUpdateResponse.from(budgetRepository.saveAndFlush(budget))
+        return UpdateBudgetResponse.from(budget)
     }
 }
