@@ -11,6 +11,7 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
+import team.nongchun.hororog.domain.diet.entity.Diet
 import team.nongchun.hororog.domain.meal.entity.MealPlan
 import team.nongchun.hororog.global.common.BaseEntity
 import team.nongchun.hororog.global.common.QuantityUnit
@@ -22,8 +23,11 @@ class Leftover(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "meal_plan_id", nullable = false)
-    val mealPlan: MealPlan,
+    @JoinColumn(name = "meal_plan_id")
+    val mealPlan: MealPlan? = null,
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "diet_id")
+    val diet: Diet? = null,
     @Column(nullable = false)
     var amount: Int,
     @Enumerated(EnumType.STRING)
