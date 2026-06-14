@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import team.nongchun.hororog.domain.diet.exception.DietNotFoundException
 import team.nongchun.hororog.domain.ingredient.exception.IngredientNotFoundException
 import team.nongchun.hororog.domain.ingredient.exception.IngredientPlanNotFoundException
 import team.nongchun.hororog.domain.ingredient.exception.InvalidQuantityUnitException
@@ -20,6 +21,12 @@ import team.nongchun.hororog.domain.member.exception.SignupRequestNotFoundExcept
 @RestControllerAdvice
 class GlobalExceptionHandler {
     private val logger = LoggerFactory.getLogger(javaClass)
+
+    @ExceptionHandler(DietNotFoundException::class)
+    fun handleDietNotFound(e: DietNotFoundException): ResponseEntity<ErrorResponse> {
+        logger.info("식단 조회 실패: {}", e.message)
+        return toResponse(HttpStatus.NOT_FOUND, e.message)
+    }
 
     @ExceptionHandler(EmailAlreadyExistsException::class)
     fun handleEmailAlreadyExists(e: EmailAlreadyExistsException): ResponseEntity<ErrorResponse> {
