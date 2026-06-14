@@ -7,4 +7,9 @@ enum class QuantityUnit {
     ML,
     EA,
     BOX,
+    ;
+
+    companion object {
+        fun fromOrNull(value: String): QuantityUnit? = entries.find { it.name == value.uppercase() }
+    }
 }
