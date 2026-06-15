@@ -51,6 +51,14 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Notify Discord
+        if: always()
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          status: ${{ job.status }}
+          title: "CD - Docker Build & Push"
+
   deploy:
     name: Deploy to on-prem server
     needs: docker
@@ -94,3 +102,11 @@ jobs:
 
       - name: Clean up unused images
         run: docker image prune -f
+
+      - name: Notify Discord
+        if: always()
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          status: ${{ job.status }}
+          title: "CD - Deploy"
