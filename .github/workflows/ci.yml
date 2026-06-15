@@ -35,3 +35,12 @@ jobs:
           name: test-report
           path: build/reports/tests/test
           if-no-files-found: ignore
+
+      - name: Notify Discord
+        if: always()
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          status: ${{ job.status }}
+          title: "CI - Build & Test"
+          description: "${{ github.event.pull_request.title }}"
