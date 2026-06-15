@@ -11,6 +11,7 @@ class CustomUserDetails(
     private val email: String,
     private val password: String,
     val role: Role,
+    val schoolName: String,
 ) : UserDetails {
     override fun getAuthorities(): Collection<GrantedAuthority> = listOf(SimpleGrantedAuthority("ROLE_${role.name}"))
 
@@ -25,6 +26,7 @@ class CustomUserDetails(
                 email = member.email,
                 password = member.password,
                 role = member.role,
+                schoolName = member.schoolName,
             )
     }
 }

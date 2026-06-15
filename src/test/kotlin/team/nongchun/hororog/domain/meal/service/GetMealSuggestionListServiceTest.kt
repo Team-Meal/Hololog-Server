@@ -12,29 +12,17 @@ import team.nongchun.hororog.domain.meal.entity.SuggestionStatus
 import team.nongchun.hororog.domain.meal.repository.MealSuggestionRepository
 import team.nongchun.hororog.domain.member.entity.Member
 import team.nongchun.hororog.domain.member.entity.Role
-import team.nongchun.hororog.domain.member.repository.MemberRepository
 import team.nongchun.hororog.global.auth.AuthenticationHolder
 import java.time.LocalDateTime
-import java.util.Optional
 
 class GetMealSuggestionListServiceTest :
     BehaviorSpec({
         isolationMode = IsolationMode.InstancePerLeaf
 
         val mealSuggestionRepository = mockk<MealSuggestionRepository>()
-        val memberRepository = mockk<MemberRepository>()
         val authenticationHolder = mockk<AuthenticationHolder>()
-        val service = GetMealSuggestionListServiceImpl(mealSuggestionRepository, memberRepository, authenticationHolder)
+        val service = GetMealSuggestionListServiceImpl(mealSuggestionRepository, authenticationHolder)
 
-        val nutritionist =
-            Member(
-                id = 1L,
-                email = "nutritionist@hororog.team",
-                password = "encoded",
-                name = "김영양",
-                schoolName = "농촌초등학교",
-                role = Role.NUTRITIONIST,
-            )
         val student =
             Member(
                 id = 2L,
@@ -58,8 +46,7 @@ class GetMealSuggestionListServiceTest :
                     this.createdAt = createdAt
                     this.updatedAt = createdAt
                 }
-            every { authenticationHolder.getCurrentUserId() } returns nutritionist.id
-            every { memberRepository.findById(nutritionist.id) } returns Optional.of(nutritionist)
+            every { authenticationHolder.getCurrentUserSchoolName() } returns "농촌초등학교"
             every { mealSuggestionRepository.findAllByMemberSchoolNameOrderByIdDesc("농촌초등학교") } returns listOf(suggestion)
 
             When("급식 추천 목록을 조회하면") {

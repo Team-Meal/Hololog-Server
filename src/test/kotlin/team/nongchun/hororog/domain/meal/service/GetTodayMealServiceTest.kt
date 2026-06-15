@@ -12,19 +12,17 @@ import team.nongchun.hororog.domain.meal.entity.MealType
 import team.nongchun.hororog.domain.meal.repository.MealRepository
 import team.nongchun.hororog.domain.member.entity.Member
 import team.nongchun.hororog.domain.member.entity.Role
-import team.nongchun.hororog.domain.member.repository.MemberRepository
 import team.nongchun.hororog.global.auth.AuthenticationHolder
 import java.time.LocalDate
-import java.util.Optional
+import java.time.ZoneId
 
 class GetTodayMealServiceTest :
     BehaviorSpec({
         isolationMode = IsolationMode.InstancePerLeaf
 
         val mealRepository = mockk<MealRepository>()
-        val memberRepository = mockk<MemberRepository>()
         val authenticationHolder = mockk<AuthenticationHolder>()
-        val service = GetTodayMealServiceImpl(mealRepository, memberRepository, authenticationHolder)
+        val service = GetTodayMealServiceImpl(mealRepository, authenticationHolder)
 
         val student =
             Member(
@@ -37,7 +35,7 @@ class GetTodayMealServiceTest :
             )
 
         Given("오늘 점심 급식이 존재할 때") {
-            val today = LocalDate.now()
+            val today = LocalDate.now(ZoneId.of("Asia/Seoul"))
             val meals =
                 listOf(
                     Meal(
@@ -61,10 +59,9 @@ class GetTodayMealServiceTest :
                         originInfo = "대두: 국내산",
                     ),
                 )
-            every { authenticationHolder.getCurrentUserId() } returns student.id
-            every { memberRepository.findById(student.id) } returns Optional.of(student)
+            every { authenticationHolder.getCurrentUserSchoolName() } returns "농촌초등학교"
             every {
-                mealRepository.findAllByMemberSchoolNameAndMealTypeAndMealDateBetweenOrderByIdAsc(
+                mealRepository.findAllByMemberSchoolNameAndMealTypeAndMealDateGreaterThanEqualAndMealDateLessThanOrderByIdAsc(
                     "농촌초등학교",
                     MealType.LUNCH,
                     any(),
@@ -83,11 +80,11 @@ class GetTodayMealServiceTest :
                     result.nutritionInfo shouldBe "탄수화물\n단백질"
                     result.originInfo shouldBe "쌀: 국내산\n대두: 국내산"
                     verify(exactly = 1) {
-                        mealRepository.findAllByMemberSchoolNameAndMealTypeAndMealDateBetweenOrderByIdAsc(
+                        mealRepository.findAllByMemberSchoolNameAndMealTypeAndMealDateGreaterThanEqualAndMealDateLessThanOrderByIdAsc(
                             "농촌초등학교",
                             MealType.LUNCH,
                             today.atStartOfDay(),
-                            today.plusDays(1).atStartOfDay().minusNanos(1),
+                            today.plusDays(1).atStartOfDay(),
                         )
                     }
                 }

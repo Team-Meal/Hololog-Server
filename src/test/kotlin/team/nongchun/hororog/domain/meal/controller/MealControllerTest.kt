@@ -119,8 +119,7 @@ class MealControllerTest
                         """
                         {
                           "title": "제육볶음",
-                          "content": "매운맛으로 먹고 싶어요.",
-                          "mealSuggestionStatus": "PENDING"
+                          "content": "매운맛으로 먹고 싶어요."
                         }
                         """.trimIndent()
                 }.andExpect {
@@ -128,29 +127,6 @@ class MealControllerTest
                 }
 
             assertEquals(1, mealSuggestionRepository.findAll().size)
-        }
-
-        @Test
-        fun `학생이 승인 상태로 급식을 추천하면 400을 반환한다`() {
-            val student = saveMember(Role.STUDENT, "student@hororog.team")
-
-            mockMvc
-                .post("/meals/suggestions") {
-                    header(HttpHeaders.AUTHORIZATION, "Bearer ${accessToken(student)}")
-                    contentType = MediaType.APPLICATION_JSON
-                    content =
-                        """
-                        {
-                          "title": "제육볶음",
-                          "content": "바로 승인되면 안 됩니다.",
-                          "mealSuggestionStatus": "APPROVED"
-                        }
-                        """.trimIndent()
-                }.andExpect {
-                    status { isBadRequest() }
-                }
-
-            assertEquals(0, mealSuggestionRepository.findAll().size)
         }
 
         @Test

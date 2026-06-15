@@ -6,7 +6,7 @@ import team.nongchun.hororog.domain.meal.entity.MealType
 import java.time.LocalDateTime
 
 interface MealRepository : JpaRepository<Meal, Long> {
-    fun findAllByMemberSchoolNameAndMealTypeAndMealDateBetweenOrderByIdAsc(
+    fun findAllByMemberSchoolNameAndMealTypeAndMealDateGreaterThanEqualAndMealDateLessThanOrderByIdAsc(
         schoolName: String,
         mealType: MealType,
         startDateTime: LocalDateTime,

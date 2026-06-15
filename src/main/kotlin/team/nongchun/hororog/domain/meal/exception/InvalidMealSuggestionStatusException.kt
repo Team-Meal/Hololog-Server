@@ -1,3 +1,3 @@
 package team.nongchun.hororog.domain.meal.exception
 
-class InvalidMealSuggestionStatusException : RuntimeException("급식 추천 생성 시 처리 상태는 PENDING만 가능합니다.")
+class InvalidMealSuggestionStatusException : RuntimeException("유효하지 않은 급식 추천 상태 전이입니다.")

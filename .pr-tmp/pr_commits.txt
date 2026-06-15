@@ -1,0 +1,2 @@
+f9cd6571a8165b8f51a2e22bc4ee10e33c309a74 f9cd657 fix(meal): 급식 추천 상태 검증 추가
+ed3aedd023b6c031f8e22b2acb0a36f24f04a6c5 ed3aedd add(meal): 급식 도메인 API 추가

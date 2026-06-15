@@ -1,6 +1,5 @@
 package team.nongchun.hororog.domain.meal.service
 
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.IsolationMode
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
@@ -11,7 +10,6 @@ import io.mockk.verify
 import team.nongchun.hororog.domain.meal.dto.CreateMealSuggestionRequest
 import team.nongchun.hororog.domain.meal.entity.MealSuggestion
 import team.nongchun.hororog.domain.meal.entity.SuggestionStatus
-import team.nongchun.hororog.domain.meal.exception.InvalidMealSuggestionStatusException
 import team.nongchun.hororog.domain.meal.repository.MealSuggestionRepository
 import team.nongchun.hororog.domain.member.entity.Member
 import team.nongchun.hororog.domain.member.entity.Role
@@ -43,7 +41,6 @@ class CreateMealSuggestionServiceTest :
                 CreateMealSuggestionRequest(
                     title = "제육볶음",
                     content = "매운맛으로 먹고 싶어요.",
-                    mealSuggestionStatus = SuggestionStatus.PENDING,
                 )
             val suggestionSlot = slot<MealSuggestion>()
             every { authenticationHolder.getCurrentUserId() } returns member.id
@@ -59,24 +56,6 @@ class CreateMealSuggestionServiceTest :
                     suggestionSlot.captured.content shouldBe "매운맛으로 먹고 싶어요."
                     suggestionSlot.captured.status shouldBe SuggestionStatus.PENDING
                     verify(exactly = 1) { mealSuggestionRepository.save(any()) }
-                }
-            }
-        }
-
-        Given("PENDING이 아닌 처리 상태로 급식 추천 요청이 주어졌을 때") {
-            val request =
-                CreateMealSuggestionRequest(
-                    title = "제육볶음",
-                    content = "바로 승인되면 안 됩니다.",
-                    mealSuggestionStatus = SuggestionStatus.APPROVED,
-                )
-
-            When("추천을 생성하면") {
-                Then("InvalidMealSuggestionStatusException이 발생하고 저장하지 않는다") {
-                    shouldThrow<InvalidMealSuggestionStatusException> {
-                        service.execute(request)
-                    }
-                    verify(exactly = 0) { mealSuggestionRepository.save(any()) }
                 }
             }
         }
