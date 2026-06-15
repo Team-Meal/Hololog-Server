@@ -13,6 +13,8 @@ import team.nongchun.hororog.global.exception.AuthenticationRequiredException
 class AuthenticationHolder {
     fun getCurrentUserId(): Long = getCurrentUser().userId
 
+    fun getCurrentUserSchoolName(): String = getCurrentUser().schoolName
+
     fun getCurrentUser(): CustomUserDetails {
         val authentication =
             SecurityContextHolder.getContext().authentication

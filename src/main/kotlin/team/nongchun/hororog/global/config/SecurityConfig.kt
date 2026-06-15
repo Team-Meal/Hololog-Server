@@ -55,6 +55,10 @@ class SecurityConfig(
                 it.requestMatchers("/auth/logout").authenticated()
                 it.requestMatchers("/admin/**").hasRole(Role.ADMIN.name)
                 it.requestMatchers(HttpMethod.POST, "/auth/signup-requests").hasRole(Role.PENDING_NUTRITIONIST.name)
+                it.requestMatchers(HttpMethod.GET, "/meals/today").hasAnyRole(Role.STUDENT.name, Role.TEACHER.name)
+                it.requestMatchers(HttpMethod.POST, "/meals/suggestions").hasAnyRole(Role.STUDENT.name, Role.TEACHER.name)
+                it.requestMatchers(HttpMethod.GET, "/meals/suggestions").hasRole(Role.NUTRITIONIST.name)
+                it.requestMatchers(HttpMethod.PATCH, "/meals/suggestions/*").hasRole(Role.NUTRITIONIST.name)
                 // 승인 전(PENDING_NUTRITIONIST) 회원은 그 외 API에 접근할 수 없다.
                 it.anyRequest().hasAnyRole(Role.NUTRITIONIST.name, Role.ADMIN.name)
             }.addFilterBefore(

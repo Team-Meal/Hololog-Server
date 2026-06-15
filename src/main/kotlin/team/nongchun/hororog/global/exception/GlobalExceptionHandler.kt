@@ -12,6 +12,8 @@ import team.nongchun.hororog.domain.diet.exception.DietNotFoundException
 import team.nongchun.hororog.domain.ingredient.exception.IngredientNotFoundException
 import team.nongchun.hororog.domain.ingredient.exception.IngredientPlanNotFoundException
 import team.nongchun.hororog.domain.ingredient.exception.InvalidQuantityUnitException
+import team.nongchun.hororog.domain.meal.exception.InvalidMealSuggestionStatusException
+import team.nongchun.hororog.domain.meal.exception.MealSuggestionNotFoundException
 import team.nongchun.hororog.domain.member.exception.EmailAlreadyExistsException
 import team.nongchun.hororog.domain.member.exception.InvalidCredentialsException
 import team.nongchun.hororog.domain.member.exception.InvalidTokenException
@@ -100,6 +102,18 @@ class GlobalExceptionHandler {
     fun handleInvalidQuantityUnit(e: InvalidQuantityUnitException): ResponseEntity<ErrorResponse> {
         logger.info("잘못된 단위 입력: {}", e.message)
         return toResponse(HttpStatus.BAD_REQUEST, e.message)
+    }
+
+    @ExceptionHandler(InvalidMealSuggestionStatusException::class)
+    fun handleInvalidMealSuggestionStatus(e: InvalidMealSuggestionStatusException): ResponseEntity<ErrorResponse> {
+        logger.info("잘못된 급식 추천 처리 상태 입력: {}", e.message)
+        return toResponse(HttpStatus.BAD_REQUEST, e.message)
+    }
+
+    @ExceptionHandler(MealSuggestionNotFoundException::class)
+    fun handleMealSuggestionNotFound(e: MealSuggestionNotFoundException): ResponseEntity<ErrorResponse> {
+        logger.info("급식 제안 조회 실패: {}", e.message)
+        return toResponse(HttpStatus.NOT_FOUND, e.message)
     }
 
     @ExceptionHandler(MethodArgumentNotValidException::class)

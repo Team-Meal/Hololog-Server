@@ -35,4 +35,8 @@ class Meal(
     var totalCalories: Int? = null,
     @Column(columnDefinition = "TEXT")
     var memo: String? = null,
+    @Column(columnDefinition = "TEXT")
+    var nutritionInfo: String? = null,
+    @Column(columnDefinition = "TEXT")
+    var originInfo: String? = null,
 ) : BaseEntity()
