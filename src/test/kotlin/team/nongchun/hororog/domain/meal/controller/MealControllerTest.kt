@@ -131,6 +131,29 @@ class MealControllerTest
         }
 
         @Test
+        fun `학생이 승인 상태로 급식을 추천하면 400을 반환한다`() {
+            val student = saveMember(Role.STUDENT, "student@hororog.team")
+
+            mockMvc
+                .post("/meals/suggestions") {
+                    header(HttpHeaders.AUTHORIZATION, "Bearer ${accessToken(student)}")
+                    contentType = MediaType.APPLICATION_JSON
+                    content =
+                        """
+                        {
+                          "title": "제육볶음",
+                          "content": "바로 승인되면 안 됩니다.",
+                          "mealSuggestionStatus": "APPROVED"
+                        }
+                        """.trimIndent()
+                }.andExpect {
+                    status { isBadRequest() }
+                }
+
+            assertEquals(0, mealSuggestionRepository.findAll().size)
+        }
+
+        @Test
         fun `영양사가 급식 추천 목록을 조회하면 같은 학교 추천만 반환한다`() {
             val nutritionist = saveMember(Role.NUTRITIONIST, "nutritionist@hororog.team")
             val student = saveMember(Role.STUDENT, "student@hororog.team")

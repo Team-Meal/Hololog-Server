@@ -4,6 +4,8 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import team.nongchun.hororog.domain.meal.dto.CreateMealSuggestionRequest
 import team.nongchun.hororog.domain.meal.entity.MealSuggestion
+import team.nongchun.hororog.domain.meal.entity.SuggestionStatus
+import team.nongchun.hororog.domain.meal.exception.InvalidMealSuggestionStatusException
 import team.nongchun.hororog.domain.meal.repository.MealSuggestionRepository
 import team.nongchun.hororog.domain.member.exception.MemberNotFoundException
 import team.nongchun.hororog.domain.member.repository.MemberRepository
@@ -17,6 +19,9 @@ class CreateMealSuggestionServiceImpl(
     private val authenticationHolder: AuthenticationHolder,
 ) : CreateMealSuggestionService {
     override fun execute(request: CreateMealSuggestionRequest) {
+        if (request.mealSuggestionStatus != SuggestionStatus.PENDING) {
+            throw InvalidMealSuggestionStatusException()
+        }
         val member =
             memberRepository
                 .findById(authenticationHolder.getCurrentUserId())
