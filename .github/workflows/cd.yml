@@ -78,19 +78,34 @@ jobs:
         id: img
         run: echo "image=ghcr.io/$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]'):main" >> "$GITHUB_OUTPUT"
 
+      - name: Check .env exists
+        id: check_env
+        run: |
+          if [ -f /opt/hololog/.env ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::/opt/hololog/.env not found — skipping deploy. Create the file to enable deployment."
+          fi
+
       - name: Copy .env from server
+        if: steps.check_env.outputs.ready == 'true'
         run: cp /opt/hololog/.env .env
 
       - name: Pull latest image
+        if: steps.check_env.outputs.ready == 'true'
         run: APP_IMAGE=${{ steps.img.outputs.image }} docker compose -f docker-compose.prod.yml pull app
 
       - name: Deploy
+        if: steps.check_env.outputs.ready == 'true'
         run: APP_IMAGE=${{ steps.img.outputs.image }} docker compose -f docker-compose.prod.yml up -d
 
       - name: Verify deployment
+        if: steps.check_env.outputs.ready == 'true'
         run: |
           sleep 20
           docker compose -f docker-compose.prod.yml ps | grep "app" | grep -q "running" || { echo "App container not running"; exit 1; }
 
       - name: Clean up unused images
+        if: steps.check_env.outputs.ready == 'true'
         run: docker image prune -f
