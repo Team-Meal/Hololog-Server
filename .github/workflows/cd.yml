@@ -111,8 +111,14 @@ jobs:
       - name: Verify deployment
         if: steps.check_env.outputs.ready == 'true'
         run: |
-          sleep 20
-          docker compose -f docker-compose.prod.yml ps | grep "app" | grep -q "running" || { echo "App container not running"; exit 1; }
+          sleep 30
+          echo "=== Container status ==="
+          docker compose -f docker-compose.prod.yml ps
+          docker compose -f docker-compose.prod.yml ps | grep "app" | grep -qiE "(Up|running)" || {
+            echo "=== App container logs ==="
+            docker compose -f docker-compose.prod.yml logs app --tail=50
+            exit 1
+          }
 
       - name: Clean up unused images
         if: steps.check_env.outputs.ready == 'true'
