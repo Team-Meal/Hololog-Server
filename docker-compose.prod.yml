@@ -1,0 +1,83 @@
+services:
+  app:
+    image: ${APP_IMAGE:-ghcr.io/OWNER/REPO:develop}
+    container_name: hororog-app
+    pull_policy: always
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:mariadb://mariadb:3306/${DB_NAME:-hororog}
+      DB_USERNAME: ${DB_USERNAME:-hororog}
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JPA_DDL_AUTO: ${JPA_DDL_AUTO:-update}
+      JAVA_OPTS: ${JAVA_OPTS:--XX:MaxRAMPercentage=75.0 -XX:+UseSerialGC -XX:+ExitOnOutOfMemoryError}
+    ports:
+      - "${SERVER_PORT:-8080}:8080"
+    deploy:
+      resources:
+        limits:
+          memory: ${APP_MEM_LIMIT:-512m}
+    restart: unless-stopped
+    networks:
+      - hororog-net
+
+  mariadb:
+    image: mariadb:11.4
+    container_name: hororog-mariadb
+    environment:
+      MARIADB_DATABASE: ${DB_NAME:-hororog}
+      MARIADB_USER: ${DB_USERNAME:-hororog}
+      MARIADB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?DB_ROOT_PASSWORD is required}
+    ports:
+      - "127.0.0.1:${DB_PORT:-3306}:3306"
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    deploy:
+      resources:
+        limits:
+          memory: ${DB_MEM_LIMIT:-512m}
+    restart: unless-stopped
+    networks:
+      - hororog-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: hororog-redis
+    command: ["redis-server", "--maxmemory", "128mb", "--maxmemory-policy", "allkeys-lru"]
+    ports:
+      - "127.0.0.1:${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          memory: ${REDIS_MEM_LIMIT:-160m}
+    restart: unless-stopped
+    networks:
+      - hororog-net
+
+volumes:
+  mariadb-data:
+  redis-data:
+
+networks:
+  hororog-net:
+    driver: bridge
