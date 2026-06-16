@@ -1,4 +1,4 @@
-package team.nongchun.hororog.domain.supplier.entity
+package team.nongchun.hororog.domain.procurement.entity
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity

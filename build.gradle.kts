@@ -21,6 +21,8 @@ repositories {
 }
 
 dependencies {
+    implementation(platform("org.springframework.cloud:spring-cloud-dependencies:2025.1.2"))
+    implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-security")
