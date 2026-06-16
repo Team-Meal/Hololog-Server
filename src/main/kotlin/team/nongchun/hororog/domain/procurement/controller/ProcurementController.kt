@@ -32,7 +32,7 @@ class ProcurementController(
         ApiResponse(responseCode = "200", description = "추천 성공"),
         ApiResponse(responseCode = "401", description = "인증 실패"),
     )
-    @PostMapping("/vendor-recommendations")
+    @GetMapping("/vendor-recommendations")
     fun getVendorRecommendations(): VendorRecommendationResponse = getVendorRecommendationsService.execute()
 
     @Operation(summary = "적정 발주량 자동 계산")

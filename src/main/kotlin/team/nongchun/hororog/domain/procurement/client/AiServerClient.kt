@@ -5,8 +5,8 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
+import team.nongchun.hororog.domain.procurement.client.dto.AiQuantityEstimationRequest
 import team.nongchun.hororog.domain.procurement.client.dto.AiVendorRecommendationRequest
-import team.nongchun.hororog.domain.procurement.dto.QuantityEstimationRequest
 import team.nongchun.hororog.domain.procurement.dto.QuantityEstimationResponse
 import team.nongchun.hororog.domain.procurement.dto.VendorRecommendationResponse
 import team.nongchun.hororog.domain.procurement.dto.VendorResponse
@@ -21,7 +21,7 @@ interface AiServerClient {
 
     @PostMapping("/quantity-estimations")
     fun estimateQuantity(
-        @RequestBody request: QuantityEstimationRequest,
+        @RequestBody request: AiQuantityEstimationRequest,
     ): QuantityEstimationResponse
 
     @GetMapping("/vendors")

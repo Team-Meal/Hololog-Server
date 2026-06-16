@@ -2,6 +2,7 @@ package team.nongchun.hororog.domain.procurement.service
 
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import team.nongchun.hororog.domain.ingredient.exception.IngredientNotFoundException
 import team.nongchun.hororog.domain.ingredient.repository.IngredientRepository
 import team.nongchun.hororog.domain.procurement.client.AiServerClient
 import team.nongchun.hororog.domain.procurement.client.dto.AiVendorRecommendationRequest
@@ -18,6 +19,7 @@ class GetVendorRecommendationsServiceImpl(
     override fun execute(): VendorRecommendationResponse {
         val schoolName = authenticationHolder.getCurrentUserSchoolName()
         val ingredients = ingredientRepository.findAllByMemberSchoolName(schoolName)
+        if (ingredients.isEmpty()) throw IngredientNotFoundException()
         val request =
             AiVendorRecommendationRequest(
                 ingredients =

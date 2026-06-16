@@ -11,7 +11,7 @@ data class VendorRecommendationResponse(
     )
 
     data class SupplierInfo(
-        val supplierId: String,
+        val aiSupplierId: String,
         val name: String,
         val contact: String?,
         val address: String?,
