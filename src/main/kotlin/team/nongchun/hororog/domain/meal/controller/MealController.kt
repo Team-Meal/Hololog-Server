@@ -6,21 +6,28 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
+import team.nongchun.hororog.domain.meal.dto.AiMealPlanResponse
+import team.nongchun.hororog.domain.meal.dto.CreateAiMealRequest
 import team.nongchun.hororog.domain.meal.dto.CreateMealSuggestionRequest
+import team.nongchun.hororog.domain.meal.dto.GenerateAiMealPlanRequest
 import team.nongchun.hororog.domain.meal.dto.MealSuggestionResponse
 import team.nongchun.hororog.domain.meal.dto.TodayMealResponse
 import team.nongchun.hororog.domain.meal.dto.UpdateMealSuggestionStatusRequest
 import team.nongchun.hororog.domain.meal.entity.MealType
+import team.nongchun.hororog.domain.meal.service.CreateAiMealService
 import team.nongchun.hororog.domain.meal.service.CreateMealSuggestionService
+import team.nongchun.hororog.domain.meal.service.GenerateAiMealPlanService
 import team.nongchun.hororog.domain.meal.service.GetMealSuggestionListService
 import team.nongchun.hororog.domain.meal.service.GetTodayMealService
 import team.nongchun.hororog.domain.meal.service.UpdateMealSuggestionStatusService
@@ -33,6 +40,8 @@ class MealController(
     private val createMealSuggestionService: CreateMealSuggestionService,
     private val getMealSuggestionListService: GetMealSuggestionListService,
     private val updateMealSuggestionStatusService: UpdateMealSuggestionStatusService,
+    private val generateAiMealPlanService: GenerateAiMealPlanService,
+    private val createAiMealService: CreateAiMealService,
 ) {
     @Operation(summary = "오늘 급식 메뉴 조회")
     @ApiResponses(
@@ -85,4 +94,32 @@ class MealController(
     ) {
         updateMealSuggestionStatusService.execute(suggestionId, request)
     }
+
+    @Operation(summary = "AI 월간 식단 자동 생성", description = "AI 서버에 월간 식단 생성을 요청합니다.")
+    @ApiResponses(
+        ApiResponse(responseCode = "200", description = "생성 성공"),
+        ApiResponse(responseCode = "400", description = "유효하지 않은 요청 값"),
+        ApiResponse(responseCode = "401", description = "인증 실패"),
+        ApiResponse(responseCode = "403", description = "권한 없음"),
+    )
+    @PostMapping("/ai-generations")
+    fun generateAiMealPlan(
+        @RequestHeader("Authorization") authorization: String,
+        @Valid @RequestBody request: GenerateAiMealPlanRequest,
+    ): AiMealPlanResponse = generateAiMealPlanService.execute(authorization, request)
+
+    @Operation(
+        summary = "AI 콜백 — 급식 메뉴/영양정보 채우기",
+        description = "AI 서버가 /diets로 만든 급식 슬롯에 메뉴명과 영양정보를 채웁니다.",
+    )
+    @ApiResponses(
+        ApiResponse(responseCode = "200", description = "갱신 성공"),
+        ApiResponse(responseCode = "400", description = "유효하지 않은 요청 값"),
+        ApiResponse(responseCode = "401", description = "인증 실패"),
+        ApiResponse(responseCode = "404", description = "급식 슬롯 없음"),
+    )
+    @PostMapping
+    fun createAiMeal(
+        @RequestBody request: CreateAiMealRequest,
+    ): ResponseEntity<Any> = ResponseEntity.ok(mapOf("id" to createAiMealService.execute(request)))
 }
