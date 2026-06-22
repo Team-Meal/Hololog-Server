@@ -19,6 +19,7 @@ import team.nongchun.hororog.domain.meal.exception.MealNotFoundException
 import team.nongchun.hororog.domain.meal.exception.MealSuggestionNotFoundException
 import team.nongchun.hororog.domain.member.exception.EmailAlreadyExistsException
 import team.nongchun.hororog.domain.member.exception.InvalidCredentialsException
+import team.nongchun.hororog.domain.member.exception.InvalidSignupRoleException
 import team.nongchun.hororog.domain.member.exception.InvalidTokenException
 import team.nongchun.hororog.domain.member.exception.MemberNotFoundException
 import team.nongchun.hororog.domain.member.exception.SignupRequestAlreadyPendingException
@@ -70,6 +71,12 @@ class GlobalExceptionHandler {
     fun handleInvalidToken(e: InvalidTokenException): ResponseEntity<ErrorResponse> {
         logger.info("토큰 검증 실패: {}", e.message)
         return toResponse(HttpStatus.UNAUTHORIZED, e.message)
+    }
+
+    @ExceptionHandler(InvalidSignupRoleException::class)
+    fun handleInvalidSignupRole(e: InvalidSignupRoleException): ResponseEntity<ErrorResponse> {
+        logger.info("잘못된 회원가입 권한 선택: {}", e.message)
+        return toResponse(HttpStatus.BAD_REQUEST, e.message)
     }
 
     @ExceptionHandler(SignupRequestAlreadyPendingException::class)
