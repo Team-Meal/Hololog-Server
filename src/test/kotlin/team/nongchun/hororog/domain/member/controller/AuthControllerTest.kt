@@ -77,7 +77,8 @@ class AuthControllerTest
                   "email": "nutritionist@hororog.team",
                   "name": "김영양",
                   "schoolName": "농촌초등학교",
-                  "password": "password1234"
+                  "password": "password1234",
+                  "role": "PENDING_NUTRITIONIST"
                 }
                 """.trimIndent()
 
@@ -99,6 +100,80 @@ class AuthControllerTest
         }
 
         @Test
+        fun `STUDENT 권한으로 요청하면 204를 반환하고 STUDENT 회원을 저장한다`() {
+            val body =
+                """
+                {
+                  "email": "student@hororog.team",
+                  "name": "김학생",
+                  "schoolName": "농촌초등학교",
+                  "password": "password1234",
+                  "role": "STUDENT"
+                }
+                """.trimIndent()
+
+            mockMvc
+                .post("/auth/signup") {
+                    contentType = MediaType.APPLICATION_JSON
+                    content = body
+                }.andExpect {
+                    status { isNoContent() }
+                }
+
+            val saved = memberRepository.findAll()
+            assertEquals(1, saved.size)
+            assertEquals(Role.STUDENT, saved.first().role)
+        }
+
+        @Test
+        fun `ADMIN 권한으로 요청하면 400을 반환한다`() {
+            val body =
+                """
+                {
+                  "email": "admin@hororog.team",
+                  "name": "김관리",
+                  "schoolName": "농촌초등학교",
+                  "password": "password1234",
+                  "role": "ADMIN"
+                }
+                """.trimIndent()
+
+            mockMvc
+                .post("/auth/signup") {
+                    contentType = MediaType.APPLICATION_JSON
+                    content = body
+                }.andExpect {
+                    status { isBadRequest() }
+                }
+
+            assertEquals(0, memberRepository.findAll().size)
+        }
+
+        @Test
+        fun `NUTRITIONIST 권한으로 요청하면 400을 반환한다`() {
+            val body =
+                """
+                {
+                  "email": "nutritionist2@hororog.team",
+                  "name": "김영양",
+                  "schoolName": "농촌초등학교",
+                  "password": "password1234",
+                  "role": "NUTRITIONIST"
+                }
+                """.trimIndent()
+
+            mockMvc
+                .post("/auth/signup") {
+                    contentType = MediaType.APPLICATION_JSON
+                    content = body
+                }.andExpect {
+                    status { isBadRequest() }
+                }
+
+            assertEquals(0, memberRepository.findAll().size)
+        }
+
+        @Test
         fun `이미 가입된 이메일이면 409를 반환한다`() {
             saveMember(email = "dup@hororog.team", rawPassword = "password1234")
 
@@ -108,7 +183,8 @@ class AuthControllerTest
                   "email": "dup@hororog.team",
                   "name": "신규",
                   "schoolName": "농촌초등학교",
-                  "password": "password1234"
+                  "password": "password1234",
+                  "role": "STUDENT"
                 }
                 """.trimIndent()
 
@@ -130,7 +206,8 @@ class AuthControllerTest
                   "email": "not-an-email",
                   "name": "김영양",
                   "schoolName": "농촌초등학교",
-                  "password": "password1234"
+                  "password": "password1234",
+                  "role": "STUDENT"
                 }
                 """.trimIndent()
 
@@ -151,7 +228,8 @@ class AuthControllerTest
                   "email": "short@hororog.team",
                   "name": "김영양",
                   "schoolName": "농촌초등학교",
-                  "password": "123"
+                  "password": "123",
+                  "role": "STUDENT"
                 }
                 """.trimIndent()
 

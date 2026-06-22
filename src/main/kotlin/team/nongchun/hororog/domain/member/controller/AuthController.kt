@@ -34,10 +34,15 @@ class AuthController(
     private val logoutService: LogoutService,
     private val createSignupRequestService: CreateSignupRequestService,
 ) {
-    @Operation(summary = "회원가입", description = "이메일, 비밀번호, 이름, 학교명으로 회원가입합니다. 가입 후 역할은 PENDING_NUTRITIONIST입니다.")
+    @Operation(
+        summary = "회원가입",
+        description =
+            "이메일, 비밀번호, 이름, 학교명, 권한으로 회원가입합니다. " +
+                "권한은 STUDENT, TEACHER, PENDING_NUTRITIONIST(영양사 희망) 중에서만 선택할 수 있습니다.",
+    )
     @ApiResponses(
         ApiResponse(responseCode = "204", description = "가입 성공"),
-        ApiResponse(responseCode = "400", description = "유효하지 않은 요청 값"),
+        ApiResponse(responseCode = "400", description = "유효하지 않은 요청 값 또는 선택할 수 없는 권한"),
         ApiResponse(responseCode = "409", description = "이미 사용 중인 이메일"),
     )
     @SecurityRequirements

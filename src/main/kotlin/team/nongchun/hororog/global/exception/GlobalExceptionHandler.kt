@@ -1,5 +1,7 @@
 package team.nongchun.hororog.global.exception
 
+import feign.FeignException
+import jakarta.validation.ConstraintViolationException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -13,14 +15,17 @@ import team.nongchun.hororog.domain.ingredient.exception.IngredientNotFoundExcep
 import team.nongchun.hororog.domain.ingredient.exception.IngredientPlanNotFoundException
 import team.nongchun.hororog.domain.ingredient.exception.InvalidQuantityUnitException
 import team.nongchun.hororog.domain.meal.exception.InvalidMealSuggestionStatusException
+import team.nongchun.hororog.domain.meal.exception.MealNotFoundException
 import team.nongchun.hororog.domain.meal.exception.MealSuggestionNotFoundException
 import team.nongchun.hororog.domain.member.exception.EmailAlreadyExistsException
 import team.nongchun.hororog.domain.member.exception.InvalidCredentialsException
+import team.nongchun.hororog.domain.member.exception.InvalidSignupRoleException
 import team.nongchun.hororog.domain.member.exception.InvalidTokenException
 import team.nongchun.hororog.domain.member.exception.MemberNotFoundException
 import team.nongchun.hororog.domain.member.exception.SignupRequestAlreadyPendingException
 import team.nongchun.hororog.domain.member.exception.SignupRequestAlreadyProcessedException
 import team.nongchun.hororog.domain.member.exception.SignupRequestNotFoundException
+import tools.jackson.core.JacksonException
 
 @RestControllerAdvice
 class GlobalExceptionHandler {
@@ -66,6 +71,12 @@ class GlobalExceptionHandler {
     fun handleInvalidToken(e: InvalidTokenException): ResponseEntity<ErrorResponse> {
         logger.info("토큰 검증 실패: {}", e.message)
         return toResponse(HttpStatus.UNAUTHORIZED, e.message)
+    }
+
+    @ExceptionHandler(InvalidSignupRoleException::class)
+    fun handleInvalidSignupRole(e: InvalidSignupRoleException): ResponseEntity<ErrorResponse> {
+        logger.info("잘못된 회원가입 권한 선택: {}", e.message)
+        return toResponse(HttpStatus.BAD_REQUEST, e.message)
     }
 
     @ExceptionHandler(SignupRequestAlreadyPendingException::class)
@@ -114,6 +125,33 @@ class GlobalExceptionHandler {
     fun handleMealSuggestionNotFound(e: MealSuggestionNotFoundException): ResponseEntity<ErrorResponse> {
         logger.info("급식 제안 조회 실패: {}", e.message)
         return toResponse(HttpStatus.NOT_FOUND, e.message)
+    }
+
+    @ExceptionHandler(MealNotFoundException::class)
+    fun handleMealNotFound(e: MealNotFoundException): ResponseEntity<ErrorResponse> {
+        logger.info("급식 조회 실패: {}", e.message)
+        return toResponse(HttpStatus.NOT_FOUND, e.message)
+    }
+
+    @ExceptionHandler(ConstraintViolationException::class)
+    fun handleConstraintViolation(e: ConstraintViolationException): ResponseEntity<ErrorResponse> {
+        val message =
+            e.constraintViolations
+                .joinToString(", ") { "${it.propertyPath}: ${it.message}" }
+                .ifBlank { "잘못된 요청입니다." }
+        return toResponse(HttpStatus.BAD_REQUEST, message)
+    }
+
+    @ExceptionHandler(JacksonException::class)
+    fun handleJsonProcessing(e: JacksonException): ResponseEntity<ErrorResponse> {
+        logger.info("요청 본문 파싱 실패: {}", e.message)
+        return toResponse(HttpStatus.BAD_REQUEST, "잘못된 요청 형식입니다.")
+    }
+
+    @ExceptionHandler(FeignException::class)
+    fun handleFeignException(e: FeignException): ResponseEntity<ErrorResponse> {
+        logger.error("외부 AI 서버 호출 실패", e)
+        return toResponse(HttpStatus.BAD_GATEWAY, "AI 서버와 통신할 수 없습니다.")
     }
 
     @ExceptionHandler(MethodArgumentNotValidException::class)
