@@ -2,7 +2,9 @@ package team.nongchun.hororog.domain.member.dto
 
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
+import team.nongchun.hororog.domain.member.entity.Role
 
 data class SignupRequest(
     @field:NotBlank
@@ -17,4 +19,6 @@ data class SignupRequest(
     @field:NotBlank
     @field:Size(min = 8, max = 255)
     val password: String,
+    @field:NotNull
+    val role: Role,
 )

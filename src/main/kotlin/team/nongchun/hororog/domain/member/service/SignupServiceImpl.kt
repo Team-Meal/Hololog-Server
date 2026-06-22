@@ -7,6 +7,7 @@ import team.nongchun.hororog.domain.member.dto.SignupRequest
 import team.nongchun.hororog.domain.member.entity.Member
 import team.nongchun.hororog.domain.member.entity.Role
 import team.nongchun.hororog.domain.member.exception.EmailAlreadyExistsException
+import team.nongchun.hororog.domain.member.exception.InvalidSignupRoleException
 import team.nongchun.hororog.domain.member.repository.MemberRepository
 
 @Service
@@ -16,6 +17,9 @@ class SignupServiceImpl(
     private val passwordEncoder: PasswordEncoder,
 ) : SignupService {
     override fun execute(request: SignupRequest) {
+        if (request.role !in ALLOWED_SIGNUP_ROLES) {
+            throw InvalidSignupRoleException()
+        }
         if (memberRepository.existsByEmail(request.email)) {
             throw EmailAlreadyExistsException()
         }
@@ -25,8 +29,12 @@ class SignupServiceImpl(
                 password = requireNotNull(passwordEncoder.encode(request.password)),
                 name = request.name,
                 schoolName = request.schoolName,
-                role = Role.PENDING_NUTRITIONIST,
+                role = request.role,
             ),
         )
+    }
+
+    companion object {
+        private val ALLOWED_SIGNUP_ROLES = setOf(Role.STUDENT, Role.TEACHER, Role.PENDING_NUTRITIONIST)
     }
 }
