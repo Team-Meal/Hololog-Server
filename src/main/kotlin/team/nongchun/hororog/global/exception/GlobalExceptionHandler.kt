@@ -5,6 +5,7 @@ import jakarta.validation.ConstraintViolationException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
@@ -146,6 +147,18 @@ class GlobalExceptionHandler {
     fun handleJsonProcessing(e: JacksonException): ResponseEntity<ErrorResponse> {
         logger.info("요청 본문 파싱 실패: {}", e.message)
         return toResponse(HttpStatus.BAD_REQUEST, "잘못된 요청 형식입니다.")
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException::class)
+    fun handleMessageNotReadable(e: HttpMessageNotReadableException): ResponseEntity<ErrorResponse> {
+        logger.info("요청 본문 읽기 실패: {}", e.message)
+        return toResponse(HttpStatus.BAD_REQUEST, "잘못된 요청 형식입니다.")
+    }
+
+    @ExceptionHandler(AuthenticationRequiredException::class)
+    fun handleAuthenticationRequired(e: AuthenticationRequiredException): ResponseEntity<ErrorResponse> {
+        logger.info("인증 정보 누락: {}", e.message)
+        return toResponse(HttpStatus.UNAUTHORIZED, e.message)
     }
 
     @ExceptionHandler(FeignException::class)

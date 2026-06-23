@@ -11,7 +11,7 @@ import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
 import team.nongchun.hororog.domain.member.entity.Member
 import team.nongchun.hororog.global.common.BaseEntity
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 @Entity
 @Table(name = "ingredient_plan")
@@ -25,9 +25,9 @@ class IngredientPlan(
     @Column(nullable = false, length = 100)
     var title: String,
     @Column(nullable = false)
-    var startDate: LocalDateTime,
+    var startDate: LocalDate,
     @Column(nullable = false)
-    var endDate: LocalDateTime,
+    var endDate: LocalDate,
     @Column(columnDefinition = "TEXT")
     var memo: String? = null,
 ) : BaseEntity()
