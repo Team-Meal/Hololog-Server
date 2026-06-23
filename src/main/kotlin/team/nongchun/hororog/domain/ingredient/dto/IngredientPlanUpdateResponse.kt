@@ -1,13 +1,14 @@
 package team.nongchun.hororog.domain.ingredient.dto
 
 import team.nongchun.hororog.domain.ingredient.entity.IngredientPlan
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class IngredientPlanUpdateResponse(
     val ingredientPlanId: Long,
     val title: String,
-    val startDate: LocalDateTime,
-    val endDate: LocalDateTime,
+    val startDate: LocalDate,
+    val endDate: LocalDate,
     val memo: String?,
     val updatedAt: LocalDateTime,
 ) {
