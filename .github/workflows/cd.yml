@@ -51,6 +51,14 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Notify Discord
+        if: always()
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          status: ${{ job.status }}
+          title: "CD - Docker Build & Push"
+
   deploy:
     name: Deploy to on-prem server
     needs: docker
@@ -78,19 +86,48 @@ jobs:
         id: img
         run: echo "image=ghcr.io/$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]'):main" >> "$GITHUB_OUTPUT"
 
+      - name: Check .env exists
+        id: check_env
+        run: |
+          if [ -f /opt/hololog/.env ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::/opt/hololog/.env not found — skipping deploy. Create the file to enable deployment."
+          fi
+
       - name: Copy .env from server
+        if: steps.check_env.outputs.ready == 'true'
         run: cp /opt/hololog/.env .env
 
       - name: Pull latest image
-        run: APP_IMAGE=${{ steps.img.outputs.image }} docker compose -f docker-compose.prod.yml pull app
+        if: steps.check_env.outputs.ready == 'true'
+        run: APP_IMAGE=${{ steps.img.outputs.image }} docker compose --env-file /opt/hololog/.env -f docker-compose.prod.yml pull app
 
       - name: Deploy
-        run: APP_IMAGE=${{ steps.img.outputs.image }} docker compose -f docker-compose.prod.yml up -d
+        if: steps.check_env.outputs.ready == 'true'
+        run: APP_IMAGE=${{ steps.img.outputs.image }} docker compose --env-file /opt/hololog/.env -f docker-compose.prod.yml up -d
 
       - name: Verify deployment
+        if: steps.check_env.outputs.ready == 'true'
         run: |
-          sleep 20
-          docker compose -f docker-compose.prod.yml ps | grep "app" | grep -q "running" || { echo "App container not running"; exit 1; }
+          sleep 30
+          echo "=== Container status ==="
+          docker compose -f docker-compose.prod.yml ps
+          docker compose -f docker-compose.prod.yml ps | grep "app" | grep -qiE "(Up|running)" || {
+            echo "=== App container logs ==="
+            docker compose -f docker-compose.prod.yml logs app --tail=50
+            exit 1
+          }
 
       - name: Clean up unused images
+        if: steps.check_env.outputs.ready == 'true'
         run: docker image prune -f
+
+      - name: Notify Discord
+        if: always()
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          status: ${{ job.status }}
+          title: "CD - Deploy"
