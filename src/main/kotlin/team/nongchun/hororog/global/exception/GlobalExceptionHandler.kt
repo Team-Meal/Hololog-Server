@@ -16,7 +16,10 @@ import team.nongchun.hororog.domain.ingredient.exception.IngredientNotFoundExcep
 import team.nongchun.hororog.domain.ingredient.exception.IngredientPlanNotFoundException
 import team.nongchun.hororog.domain.ingredient.exception.InvalidIngredientPlanException
 import team.nongchun.hororog.domain.ingredient.exception.InvalidQuantityUnitException
+import team.nongchun.hororog.domain.meal.exception.AiMealGenerationAlreadyInProgressException
+import team.nongchun.hororog.domain.meal.exception.AiMealGenerationAlreadySucceededException
 import team.nongchun.hororog.domain.meal.exception.InvalidMealSuggestionStatusException
+import team.nongchun.hororog.domain.meal.exception.MealAiGenerationNotFoundException
 import team.nongchun.hororog.domain.meal.exception.MealNotFoundException
 import team.nongchun.hororog.domain.meal.exception.MealSuggestionNotFoundException
 import team.nongchun.hororog.domain.member.exception.EmailAlreadyExistsException
@@ -139,6 +142,24 @@ class GlobalExceptionHandler {
     fun handleMealNotFound(e: MealNotFoundException): ResponseEntity<ErrorResponse> {
         logger.info("급식 조회 실패: {}", e.message)
         return toResponse(HttpStatus.NOT_FOUND, e.message)
+    }
+
+    @ExceptionHandler(MealAiGenerationNotFoundException::class)
+    fun handleMealAiGenerationNotFound(e: MealAiGenerationNotFoundException): ResponseEntity<ErrorResponse> {
+        logger.info("AI 식단 생성 작업 조회 실패: {}", e.message)
+        return toResponse(HttpStatus.NOT_FOUND, e.message)
+    }
+
+    @ExceptionHandler(AiMealGenerationAlreadyInProgressException::class)
+    fun handleAiMealGenerationAlreadyInProgress(e: AiMealGenerationAlreadyInProgressException): ResponseEntity<ErrorResponse> {
+        logger.info("AI 식단 생성 중복 요청: {}", e.message)
+        return toResponse(HttpStatus.CONFLICT, e.message)
+    }
+
+    @ExceptionHandler(AiMealGenerationAlreadySucceededException::class)
+    fun handleAiMealGenerationAlreadySucceeded(e: AiMealGenerationAlreadySucceededException): ResponseEntity<ErrorResponse> {
+        logger.info("AI 식단 생성 재생성 요청: {}", e.message)
+        return toResponse(HttpStatus.CONFLICT, e.message)
     }
 
     @ExceptionHandler(ConstraintViolationException::class)
