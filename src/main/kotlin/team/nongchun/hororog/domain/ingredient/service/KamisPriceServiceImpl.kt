@@ -1,6 +1,5 @@
 package team.nongchun.hororog.domain.ingredient.service
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import team.nongchun.hororog.domain.ingredient.cache.KamisPriceCache
@@ -8,6 +7,7 @@ import team.nongchun.hororog.domain.ingredient.cache.KamisPriceCacheRepository
 import team.nongchun.hororog.domain.ingredient.client.KamisClient
 import team.nongchun.hororog.domain.ingredient.dto.IngredientPriceResponse
 import team.nongchun.hororog.global.config.KamisProperties
+import tools.jackson.databind.ObjectMapper
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
