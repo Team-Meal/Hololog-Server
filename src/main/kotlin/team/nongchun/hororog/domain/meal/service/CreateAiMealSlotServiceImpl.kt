@@ -19,9 +19,11 @@ class CreateAiMealSlotServiceImpl(
     private val authenticationHolder: AuthenticationHolder,
 ) : CreateAiMealSlotService {
     override fun execute(request: CreateAiMealSlotRequest): Long {
+        val userId = authenticationHolder.getCurrentUserId()
+        if (request.schoolId != userId) throw MemberNotFoundException()
         val member =
             memberRepository
-                .findById(authenticationHolder.getCurrentUserId())
+                .findById(userId)
                 .orElseThrow { MemberNotFoundException() }
         val meal =
             mealRepository.save(

@@ -7,17 +7,21 @@ import team.nongchun.hororog.domain.diet.dto.ExportDietRequest
 import team.nongchun.hororog.domain.diet.entity.DietExportFormat
 import team.nongchun.hororog.domain.diet.exception.DietNotFoundException
 import team.nongchun.hororog.domain.diet.repository.DietRepository
+import team.nongchun.hororog.global.auth.AuthenticationHolder
 
 @Service
 @Transactional(readOnly = true)
 class ExportDietServiceImpl(
     private val dietRepository: DietRepository,
+    private val authenticationHolder: AuthenticationHolder,
 ) : ExportDietService {
     override fun execute(
         dietId: Long,
         request: ExportDietRequest,
     ): DietExportResponse {
-        val diet = dietRepository.findById(dietId).orElseThrow { DietNotFoundException() }
+        val diet =
+            dietRepository.findByIdAndMemberSchoolName(dietId, authenticationHolder.getCurrentUserSchoolName())
+                ?: throw DietNotFoundException()
         val fileUrl = generateFileUrl(diet.id, request.dietExportFormat)
         return DietExportResponse(
             id = diet.id,

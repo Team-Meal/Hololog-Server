@@ -14,6 +14,6 @@ class GetDietListServiceImpl(
 ) : GetDietListService {
     override fun execute(): List<DietListResponse> =
         dietRepository
-            .findAllByMemberId(authenticationHolder.getCurrentUserId())
+            .findAllByMemberSchoolNameOrderByIdDesc(authenticationHolder.getCurrentUserSchoolName())
             .map { DietListResponse.from(it) }
 }
