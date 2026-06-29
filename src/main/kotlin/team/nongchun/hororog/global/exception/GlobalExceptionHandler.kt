@@ -14,6 +14,7 @@ import team.nongchun.hororog.domain.budget.exception.InvalidBudgetException
 import team.nongchun.hororog.domain.diet.exception.DietNotFoundException
 import team.nongchun.hororog.domain.ingredient.exception.IngredientNotFoundException
 import team.nongchun.hororog.domain.ingredient.exception.IngredientPlanNotFoundException
+import team.nongchun.hororog.domain.ingredient.exception.InvalidIngredientPlanException
 import team.nongchun.hororog.domain.ingredient.exception.InvalidQuantityUnitException
 import team.nongchun.hororog.domain.meal.exception.InvalidMealSuggestionStatusException
 import team.nongchun.hororog.domain.meal.exception.MealNotFoundException
@@ -108,6 +109,12 @@ class GlobalExceptionHandler {
     fun handleIngredientPlanNotFound(e: IngredientPlanNotFoundException): ResponseEntity<ErrorResponse> {
         logger.info("식자재 계획표 조회 실패: {}", e.message)
         return toResponse(HttpStatus.NOT_FOUND, e.message)
+    }
+
+    @ExceptionHandler(InvalidIngredientPlanException::class)
+    fun handleInvalidIngredientPlan(e: InvalidIngredientPlanException): ResponseEntity<ErrorResponse> {
+        logger.info("잘못된 식자재 계획표 입력: {}", e.message)
+        return toResponse(HttpStatus.BAD_REQUEST, e.message)
     }
 
     @ExceptionHandler(InvalidQuantityUnitException::class)
