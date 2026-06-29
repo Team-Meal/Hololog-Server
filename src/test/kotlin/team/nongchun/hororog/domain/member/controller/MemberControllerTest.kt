@@ -9,6 +9,7 @@ import org.springframework.http.MediaType
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.patch
 import org.springframework.transaction.annotation.Transactional
 import team.nongchun.hororog.domain.member.entity.Member
@@ -32,18 +33,39 @@ class MemberControllerTest
         @MockitoBean
         lateinit var refreshTokenRepository: RefreshTokenRepository
 
-        private fun saveMember() =
-            memberRepository.save(
-                Member(
-                    email = "nutritionist@hororog.team",
-                    password = requireNotNull(passwordEncoder.encode("password1234")),
-                    name = "김영양",
-                    schoolName = "농촌초등학교",
-                    role = Role.NUTRITIONIST,
-                ),
-            )
+        private fun saveMember(
+            role: Role = Role.NUTRITIONIST,
+            email: String = "nutritionist@hororog.team",
+        ) = memberRepository.save(
+            Member(
+                email = email,
+                password = requireNotNull(passwordEncoder.encode("password1234")),
+                name = "김영양",
+                schoolName = "농촌초등학교",
+                role = role,
+            ),
+        )
 
         private fun accessToken(member: Member) = jwtProvider.createAccessToken(member.id, member.role)
+
+        @Test
+        fun `학생 교사 영양사가 내 프로필을 조회하면 200을 반환한다`() {
+            listOf(
+                saveMember(Role.STUDENT, "student@hororog.team"),
+                saveMember(Role.TEACHER, "teacher@hororog.team"),
+                saveMember(Role.NUTRITIONIST, "nutritionist@hororog.team"),
+            ).forEach { member ->
+                mockMvc
+                    .get("/members/me") {
+                        header(HttpHeaders.AUTHORIZATION, "Bearer ${accessToken(member)}")
+                    }.andExpect {
+                        status { isOk() }
+                        jsonPath("$.name") { value("김영양") }
+                        jsonPath("$.role") { value(member.role.name) }
+                        jsonPath("$.schoolName") { value("농촌초등학교") }
+                    }
+            }
+        }
 
         @Test
         fun `영양사가 학교명을 직접 수정하면 403을 반환하고 학교명은 변경되지 않는다`() {

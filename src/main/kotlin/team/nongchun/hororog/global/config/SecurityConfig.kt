@@ -74,6 +74,7 @@ class SecurityConfig(
                 it.requestMatchers("/auth/logout").authenticated()
                 it.requestMatchers("/admin/**").hasRole(Role.ADMIN.name)
                 it.requestMatchers(HttpMethod.POST, "/auth/signup-requests").hasRole(Role.PENDING_NUTRITIONIST.name)
+                it.requestMatchers(HttpMethod.GET, "/members/me").authenticated()
                 it.requestMatchers(HttpMethod.GET, "/meals/today").hasAnyRole(Role.STUDENT.name, Role.TEACHER.name, Role.NUTRITIONIST.name)
                 it.requestMatchers(HttpMethod.POST, "/meals/suggestions").hasAnyRole(Role.STUDENT.name, Role.TEACHER.name)
                 it.requestMatchers(HttpMethod.GET, "/meals/suggestions").hasRole(Role.NUTRITIONIST.name)
