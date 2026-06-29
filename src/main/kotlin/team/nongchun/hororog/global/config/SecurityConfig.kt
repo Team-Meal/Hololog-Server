@@ -20,9 +20,10 @@ import team.nongchun.hororog.global.auth.CustomUserDetailsService
 import team.nongchun.hororog.global.auth.JwtAuthenticationFilter
 import team.nongchun.hororog.global.auth.JwtProperties
 import team.nongchun.hororog.global.auth.JwtProvider
+import team.nongchun.hororog.global.config.KamisProperties
 
 @Configuration
-@EnableConfigurationProperties(JwtProperties::class, CorsProperties::class)
+@EnableConfigurationProperties(JwtProperties::class, CorsProperties::class, KamisProperties::class)
 class SecurityConfig(
     private val jwtProvider: JwtProvider,
     private val customUserDetailsService: CustomUserDetailsService,
