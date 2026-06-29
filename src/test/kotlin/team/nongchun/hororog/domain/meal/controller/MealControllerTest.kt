@@ -176,4 +176,52 @@ class MealControllerTest
                     status { isForbidden() }
                 }
         }
+
+        @Test
+        fun `AI 급식 콜백의 메뉴명이 비어 있으면 400을 반환한다`() {
+            val nutritionist = saveMember(Role.NUTRITIONIST, "nutritionist@hororog.team")
+
+            mockMvc
+                .post("/meals") {
+                    header(HttpHeaders.AUTHORIZATION, "Bearer ${accessToken(nutritionist)}")
+                    contentType = MediaType.APPLICATION_JSON
+                    content =
+                        """
+                        {
+                          "diet_id": 1,
+                          "menu_name": "",
+                          "kcal": 100.0,
+                          "protein": 10.0,
+                          "fat": 5.0,
+                          "sodium": 300.0
+                        }
+                        """.trimIndent()
+                }.andExpect {
+                    status { isBadRequest() }
+                }
+        }
+
+        @Test
+        fun `AI 급식 콜백의 영양값이 음수이면 400을 반환한다`() {
+            val nutritionist = saveMember(Role.NUTRITIONIST, "nutritionist@hororog.team")
+
+            mockMvc
+                .post("/meals") {
+                    header(HttpHeaders.AUTHORIZATION, "Bearer ${accessToken(nutritionist)}")
+                    contentType = MediaType.APPLICATION_JSON
+                    content =
+                        """
+                        {
+                          "diet_id": 1,
+                          "menu_name": "현미밥",
+                          "kcal": -1.0,
+                          "protein": 10.0,
+                          "fat": 5.0,
+                          "sodium": 300.0
+                        }
+                        """.trimIndent()
+                }.andExpect {
+                    status { isBadRequest() }
+                }
+        }
     }

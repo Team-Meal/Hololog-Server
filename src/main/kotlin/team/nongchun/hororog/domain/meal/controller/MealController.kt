@@ -120,6 +120,6 @@ class MealController(
     )
     @PostMapping
     fun createAiMeal(
-        @RequestBody request: CreateAiMealRequest,
+        @Valid @RequestBody request: CreateAiMealRequest,
     ): ResponseEntity<Any> = ResponseEntity.ok(mapOf("id" to createAiMealService.execute(request)))
 }
