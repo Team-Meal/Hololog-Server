@@ -25,6 +25,7 @@ import team.nongchun.hororog.domain.member.repository.MemberRepository
 import team.nongchun.hororog.global.auth.JwtProvider
 import team.nongchun.hororog.global.auth.RefreshTokenRepository
 import java.time.LocalDate
+import java.time.ZoneId
 import kotlin.test.assertEquals
 
 @SpringBootTest
@@ -68,7 +69,7 @@ class MealControllerTest
                 member = member,
                 name = name,
                 mealType = mealType,
-                mealDate = LocalDate.now().atTime(12, 0),
+                mealDate = LocalDate.now(ZoneId.of("Asia/Seoul")).atTime(12, 0),
                 totalCalories = 100,
                 nutritionInfo = "단백질",
                 originInfo = "쌀: 국내산",
