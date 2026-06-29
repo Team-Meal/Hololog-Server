@@ -17,6 +17,7 @@ class CreateIngredientPlanServiceImpl(
     private val authenticationHolder: AuthenticationHolder,
 ) : CreateIngredientPlanService {
     override fun execute(request: CreateIngredientPlanRequest) {
+        IngredientPlanValidator.validate(request.startDate, request.endDate)
         val member =
             memberRepository
                 .findById(authenticationHolder.getCurrentUserId())
