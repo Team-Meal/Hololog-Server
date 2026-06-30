@@ -6,26 +6,19 @@ import team.nongchun.hororog.domain.budget.dto.UpdateBudgetRequest
 import team.nongchun.hororog.domain.budget.dto.UpdateBudgetResponse
 import team.nongchun.hororog.domain.budget.exception.BudgetNotFoundException
 import team.nongchun.hororog.domain.budget.repository.BudgetRepository
-import team.nongchun.hororog.domain.member.exception.MemberNotFoundException
-import team.nongchun.hororog.domain.member.repository.MemberRepository
 import team.nongchun.hororog.global.auth.AuthenticationHolder
 
 @Service
 @Transactional
 class UpdateBudgetServiceImpl(
     private val budgetRepository: BudgetRepository,
-    private val memberRepository: MemberRepository,
     private val authenticationHolder: AuthenticationHolder,
 ) : UpdateBudgetService {
     override fun execute(
         budgetId: Long,
         request: UpdateBudgetRequest,
     ): UpdateBudgetResponse {
-        val schoolName =
-            memberRepository
-                .findById(authenticationHolder.getCurrentUserId())
-                .orElseThrow { MemberNotFoundException() }
-                .schoolName
+        val schoolName = authenticationHolder.getCurrentUserSchoolName()
         val budget =
             budgetRepository.findByIdAndMemberSchoolName(budgetId, schoolName)
                 ?: throw BudgetNotFoundException()

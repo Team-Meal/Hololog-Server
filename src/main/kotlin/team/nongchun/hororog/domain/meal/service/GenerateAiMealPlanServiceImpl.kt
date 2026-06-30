@@ -12,15 +12,12 @@ import team.nongchun.hororog.domain.meal.entity.MealAiGenerationStatus.SUCCEEDED
 import team.nongchun.hororog.domain.meal.exception.AiMealGenerationAlreadyInProgressException
 import team.nongchun.hororog.domain.meal.exception.AiMealGenerationAlreadySucceededException
 import team.nongchun.hororog.domain.meal.repository.MealAiGenerationRepository
-import team.nongchun.hororog.domain.member.exception.MemberNotFoundException
-import team.nongchun.hororog.domain.member.repository.MemberRepository
 import team.nongchun.hororog.global.auth.AuthenticationHolder
 
 @Service
 @Transactional
 class GenerateAiMealPlanServiceImpl(
     private val mealAiGenerationRepository: MealAiGenerationRepository,
-    private val memberRepository: MemberRepository,
     private val authenticationHolder: AuthenticationHolder,
     private val asyncService: AiMealGenerationAsyncService,
 ) : GenerateAiMealPlanService {
@@ -28,21 +25,19 @@ class GenerateAiMealPlanServiceImpl(
         authorization: String,
         request: GenerateAiMealPlanRequest,
     ): MealAiGenerationResponse {
-        val member =
-            memberRepository
-                .findById(authenticationHolder.getCurrentUserId())
-                .orElseThrow { MemberNotFoundException() }
+        val schoolName = authenticationHolder.getCurrentUserSchoolName()
+        val userId = authenticationHolder.getCurrentUserId()
 
         mealAiGenerationRepository
             .findBySchoolNameAndMonthAndStatusIn(
-                schoolName = member.schoolName,
+                schoolName = schoolName,
                 month = request.month,
                 statuses = listOf(PENDING, RUNNING),
             )?.let { throw AiMealGenerationAlreadyInProgressException() }
 
         mealAiGenerationRepository
             .findBySchoolNameAndMonthAndStatus(
-                schoolName = member.schoolName,
+                schoolName = schoolName,
                 month = request.month,
                 status = SUCCEEDED,
             )?.let { throw AiMealGenerationAlreadySucceededException() }
@@ -50,7 +45,7 @@ class GenerateAiMealPlanServiceImpl(
         val generation =
             mealAiGenerationRepository.save(
                 MealAiGeneration(
-                    schoolName = member.schoolName,
+                    schoolName = schoolName,
                     month = request.month,
                 ),
             )
@@ -61,7 +56,7 @@ class GenerateAiMealPlanServiceImpl(
             aiRequest =
                 AiGeneratePlanRequest(
                     month = request.month,
-                    schoolId = member.id,
+                    schoolId = userId,
                     holidays = request.holidays.map { it.toString() },
                 ),
         )

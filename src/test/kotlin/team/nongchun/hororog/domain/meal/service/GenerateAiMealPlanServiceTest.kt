@@ -14,37 +14,21 @@ import team.nongchun.hororog.domain.meal.entity.MealAiGenerationStatus.SUCCEEDED
 import team.nongchun.hororog.domain.meal.exception.AiMealGenerationAlreadyInProgressException
 import team.nongchun.hororog.domain.meal.exception.AiMealGenerationAlreadySucceededException
 import team.nongchun.hororog.domain.meal.repository.MealAiGenerationRepository
-import team.nongchun.hororog.domain.member.entity.Member
-import team.nongchun.hororog.domain.member.entity.Role
-import team.nongchun.hororog.domain.member.repository.MemberRepository
 import team.nongchun.hororog.global.auth.AuthenticationHolder
 import java.time.LocalDate
-import java.util.Optional
 
 class GenerateAiMealPlanServiceTest :
     BehaviorSpec({
         isolationMode = IsolationMode.InstancePerLeaf
 
         val mealAiGenerationRepository = mockk<MealAiGenerationRepository>()
-        val memberRepository = mockk<MemberRepository>()
         val authenticationHolder = mockk<AuthenticationHolder>()
         val asyncService = mockk<AiMealGenerationAsyncService>(relaxed = true)
         val service =
             GenerateAiMealPlanServiceImpl(
                 mealAiGenerationRepository,
-                memberRepository,
                 authenticationHolder,
                 asyncService,
-            )
-
-        val member =
-            Member(
-                id = 1L,
-                email = "nutritionist@hororog.team",
-                password = "encoded",
-                name = "김영양",
-                schoolName = "농촌초등학교",
-                role = Role.NUTRITIONIST,
             )
 
         val request =
@@ -54,8 +38,8 @@ class GenerateAiMealPlanServiceTest :
             )
 
         Given("진행 중인 작업이 없고 성공한 작업도 없을 때") {
-            every { authenticationHolder.getCurrentUserId() } returns member.id
-            every { memberRepository.findById(member.id) } returns Optional.of(member)
+            every { authenticationHolder.getCurrentUserSchoolName() } returns "농촌초등학교"
+            every { authenticationHolder.getCurrentUserId() } returns 1L
             every {
                 mealAiGenerationRepository.findBySchoolNameAndMonthAndStatusIn(
                     "농촌초등학교",
@@ -86,8 +70,8 @@ class GenerateAiMealPlanServiceTest :
         }
 
         Given("같은 학교, 같은 월에 PENDING 작업이 있을 때") {
-            every { authenticationHolder.getCurrentUserId() } returns member.id
-            every { memberRepository.findById(member.id) } returns Optional.of(member)
+            every { authenticationHolder.getCurrentUserSchoolName() } returns "농촌초등학교"
+            every { authenticationHolder.getCurrentUserId() } returns 1L
             every {
                 mealAiGenerationRepository.findBySchoolNameAndMonthAndStatusIn(
                     "농촌초등학교",
@@ -107,8 +91,8 @@ class GenerateAiMealPlanServiceTest :
         }
 
         Given("같은 학교, 같은 월에 SUCCEEDED 작업이 있을 때") {
-            every { authenticationHolder.getCurrentUserId() } returns member.id
-            every { memberRepository.findById(member.id) } returns Optional.of(member)
+            every { authenticationHolder.getCurrentUserSchoolName() } returns "농촌초등학교"
+            every { authenticationHolder.getCurrentUserId() } returns 1L
             every {
                 mealAiGenerationRepository.findBySchoolNameAndMonthAndStatusIn(
                     "농촌초등학교",
