@@ -56,7 +56,8 @@ team.nongchun.hororog
 ├── service/      # Business logic
 ├── repository/   # DB access (JpaRepository)
 ├── entity/       # JPA entities
-└── dto/          # Request/response DTOs
+├── dto/          # Request/response DTOs
+└── client/       # External API FeignClients
 ```
 
 ## Naming Conventions
