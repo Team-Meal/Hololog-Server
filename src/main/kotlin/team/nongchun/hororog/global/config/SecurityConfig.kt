@@ -36,6 +36,7 @@ class SecurityConfig(
                 "/auth/signup",
                 "/auth/signin",
                 "/auth/reissue",
+                "/diets/ai-callback",
                 "/swagger-ui/**",
                 "/v3/api-docs/**",
             )
