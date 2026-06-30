@@ -14,8 +14,12 @@ import team.nongchun.hororog.domain.budget.exception.InvalidBudgetException
 import team.nongchun.hororog.domain.diet.exception.DietNotFoundException
 import team.nongchun.hororog.domain.ingredient.exception.IngredientNotFoundException
 import team.nongchun.hororog.domain.ingredient.exception.IngredientPlanNotFoundException
-import team.nongchun.hororog.domain.ingredient.exception.InvalidQuantityUnitException
+import team.nongchun.hororog.domain.ingredient.exception.InvalidIngredientPlanException
+import team.nongchun.hororog.domain.leftover.exception.LeftoverNotFoundException
+import team.nongchun.hororog.domain.meal.exception.AiMealGenerationAlreadyInProgressException
+import team.nongchun.hororog.domain.meal.exception.AiMealGenerationAlreadySucceededException
 import team.nongchun.hororog.domain.meal.exception.InvalidMealSuggestionStatusException
+import team.nongchun.hororog.domain.meal.exception.MealAiGenerationNotFoundException
 import team.nongchun.hororog.domain.meal.exception.MealNotFoundException
 import team.nongchun.hororog.domain.meal.exception.MealSuggestionNotFoundException
 import team.nongchun.hororog.domain.member.exception.EmailAlreadyExistsException
@@ -26,6 +30,10 @@ import team.nongchun.hororog.domain.member.exception.MemberNotFoundException
 import team.nongchun.hororog.domain.member.exception.SignupRequestAlreadyPendingException
 import team.nongchun.hororog.domain.member.exception.SignupRequestAlreadyProcessedException
 import team.nongchun.hororog.domain.member.exception.SignupRequestNotFoundException
+import team.nongchun.hororog.domain.order.exception.OrderPlanItemNotFoundException
+import team.nongchun.hororog.domain.order.exception.OrderPlanNotFoundException
+import team.nongchun.hororog.domain.supplier.exception.SupplierNotFoundException
+import team.nongchun.hororog.global.exception.InvalidQuantityUnitException
 import tools.jackson.core.JacksonException
 
 @RestControllerAdvice
@@ -47,6 +55,12 @@ class GlobalExceptionHandler {
     @ExceptionHandler(DietNotFoundException::class)
     fun handleDietNotFound(e: DietNotFoundException): ResponseEntity<ErrorResponse> {
         logger.info("식단 조회 실패: {}", e.message)
+        return toResponse(HttpStatus.NOT_FOUND, e.message)
+    }
+
+    @ExceptionHandler(LeftoverNotFoundException::class)
+    fun handleLeftoverNotFound(e: LeftoverNotFoundException): ResponseEntity<ErrorResponse> {
+        logger.info("잔반 조회 실패: {}", e.message)
         return toResponse(HttpStatus.NOT_FOUND, e.message)
     }
 
@@ -110,6 +124,12 @@ class GlobalExceptionHandler {
         return toResponse(HttpStatus.NOT_FOUND, e.message)
     }
 
+    @ExceptionHandler(InvalidIngredientPlanException::class)
+    fun handleInvalidIngredientPlan(e: InvalidIngredientPlanException): ResponseEntity<ErrorResponse> {
+        logger.info("잘못된 식자재 계획표 입력: {}", e.message)
+        return toResponse(HttpStatus.BAD_REQUEST, e.message)
+    }
+
     @ExceptionHandler(InvalidQuantityUnitException::class)
     fun handleInvalidQuantityUnit(e: InvalidQuantityUnitException): ResponseEntity<ErrorResponse> {
         logger.info("잘못된 단위 입력: {}", e.message)
@@ -131,6 +151,42 @@ class GlobalExceptionHandler {
     @ExceptionHandler(MealNotFoundException::class)
     fun handleMealNotFound(e: MealNotFoundException): ResponseEntity<ErrorResponse> {
         logger.info("급식 조회 실패: {}", e.message)
+        return toResponse(HttpStatus.NOT_FOUND, e.message)
+    }
+
+    @ExceptionHandler(MealAiGenerationNotFoundException::class)
+    fun handleMealAiGenerationNotFound(e: MealAiGenerationNotFoundException): ResponseEntity<ErrorResponse> {
+        logger.info("AI 식단 생성 작업 조회 실패: {}", e.message)
+        return toResponse(HttpStatus.NOT_FOUND, e.message)
+    }
+
+    @ExceptionHandler(AiMealGenerationAlreadyInProgressException::class)
+    fun handleAiMealGenerationAlreadyInProgress(e: AiMealGenerationAlreadyInProgressException): ResponseEntity<ErrorResponse> {
+        logger.info("AI 식단 생성 중복 요청: {}", e.message)
+        return toResponse(HttpStatus.CONFLICT, e.message)
+    }
+
+    @ExceptionHandler(AiMealGenerationAlreadySucceededException::class)
+    fun handleAiMealGenerationAlreadySucceeded(e: AiMealGenerationAlreadySucceededException): ResponseEntity<ErrorResponse> {
+        logger.info("AI 식단 생성 재생성 요청: {}", e.message)
+        return toResponse(HttpStatus.CONFLICT, e.message)
+    }
+
+    @ExceptionHandler(SupplierNotFoundException::class)
+    fun handleSupplierNotFound(e: SupplierNotFoundException): ResponseEntity<ErrorResponse> {
+        logger.info("공급처 조회 실패: {}", e.message)
+        return toResponse(HttpStatus.NOT_FOUND, e.message)
+    }
+
+    @ExceptionHandler(OrderPlanNotFoundException::class)
+    fun handleOrderPlanNotFound(e: OrderPlanNotFoundException): ResponseEntity<ErrorResponse> {
+        logger.info("발주 계획 조회 실패: {}", e.message)
+        return toResponse(HttpStatus.NOT_FOUND, e.message)
+    }
+
+    @ExceptionHandler(OrderPlanItemNotFoundException::class)
+    fun handleOrderPlanItemNotFound(e: OrderPlanItemNotFoundException): ResponseEntity<ErrorResponse> {
+        logger.info("발주 계획 항목 조회 실패: {}", e.message)
         return toResponse(HttpStatus.NOT_FOUND, e.message)
     }
 

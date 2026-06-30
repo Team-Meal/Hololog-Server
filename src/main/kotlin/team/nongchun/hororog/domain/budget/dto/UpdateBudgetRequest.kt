@@ -8,9 +8,9 @@ data class UpdateBudgetRequest(
     @field:Size(max = 100)
     val title: String? = null,
     @field:Min(0)
-    val totalAmount: Int? = null,
+    val totalAmount: Long? = null,
     @field:Min(0)
-    val usedAmount: Int? = null,
+    val usedAmount: Long? = null,
     val startDate: LocalDate? = null,
     val endDate: LocalDate? = null,
 )

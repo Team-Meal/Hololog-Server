@@ -6,8 +6,8 @@ import java.time.LocalDate
 object BudgetValidator {
     fun validate(
         title: String,
-        totalAmount: Int,
-        usedAmount: Int,
+        totalAmount: Long,
+        usedAmount: Long,
         startDate: LocalDate,
         endDate: LocalDate,
     ) {

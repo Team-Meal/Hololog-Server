@@ -30,6 +30,11 @@ class UpdateIngredientPlanServiceImpl(
             ingredientPlanRepository.findByIdAndMemberSchoolName(planId, schoolName)
                 ?: throw IngredientPlanNotFoundException()
 
+        IngredientPlanValidator.validate(
+            startDate = request.startDate ?: plan.startDate,
+            endDate = request.endDate ?: plan.endDate,
+        )
+
         request.title?.let { plan.title = it }
         request.startDate?.let { plan.startDate = it }
         request.endDate?.let { plan.endDate = it }

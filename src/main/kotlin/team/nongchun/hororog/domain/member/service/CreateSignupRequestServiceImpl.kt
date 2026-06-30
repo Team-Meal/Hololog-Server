@@ -2,7 +2,7 @@ package team.nongchun.hororog.domain.member.service
 
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import team.nongchun.hororog.domain.member.dto.CreateSignupRequestRequest
+import team.nongchun.hororog.domain.member.dto.CreateSignupRequest
 import team.nongchun.hororog.domain.member.dto.SignupRequestResponse
 import team.nongchun.hororog.domain.member.entity.NutritionistSignupRequest
 import team.nongchun.hororog.domain.member.entity.SignupStatus
@@ -19,7 +19,7 @@ class CreateSignupRequestServiceImpl(
     private val nutritionistSignupRequestRepository: NutritionistSignupRequestRepository,
     private val authenticationHolder: AuthenticationHolder,
 ) : CreateSignupRequestService {
-    override fun execute(request: CreateSignupRequestRequest): SignupRequestResponse {
+    override fun execute(request: CreateSignupRequest): SignupRequestResponse {
         val userId = authenticationHolder.getCurrentUserId()
         val member =
             memberRepository

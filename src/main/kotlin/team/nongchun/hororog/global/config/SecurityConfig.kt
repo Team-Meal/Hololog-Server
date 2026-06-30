@@ -20,9 +20,10 @@ import team.nongchun.hororog.global.auth.CustomUserDetailsService
 import team.nongchun.hororog.global.auth.JwtAuthenticationFilter
 import team.nongchun.hororog.global.auth.JwtProperties
 import team.nongchun.hororog.global.auth.JwtProvider
+import team.nongchun.hororog.global.config.KamisProperties
 
 @Configuration
-@EnableConfigurationProperties(JwtProperties::class, CorsProperties::class)
+@EnableConfigurationProperties(JwtProperties::class, CorsProperties::class, KamisProperties::class)
 class SecurityConfig(
     private val jwtProvider: JwtProvider,
     private val customUserDetailsService: CustomUserDetailsService,
@@ -35,6 +36,7 @@ class SecurityConfig(
                 "/auth/signup",
                 "/auth/signin",
                 "/auth/reissue",
+                "/diets/ai-callback",
                 "/swagger-ui/**",
                 "/v3/api-docs/**",
             )
@@ -74,10 +76,12 @@ class SecurityConfig(
                 it.requestMatchers("/auth/logout").authenticated()
                 it.requestMatchers("/admin/**").hasRole(Role.ADMIN.name)
                 it.requestMatchers(HttpMethod.POST, "/auth/signup-requests").hasRole(Role.PENDING_NUTRITIONIST.name)
-                it.requestMatchers(HttpMethod.GET, "/meals/today").hasAnyRole(Role.STUDENT.name, Role.TEACHER.name)
+                it.requestMatchers(HttpMethod.GET, "/members/me").authenticated()
+                it.requestMatchers(HttpMethod.GET, "/meals/today").hasAnyRole(Role.STUDENT.name, Role.TEACHER.name, Role.NUTRITIONIST.name)
                 it.requestMatchers(HttpMethod.POST, "/meals/suggestions").hasAnyRole(Role.STUDENT.name, Role.TEACHER.name)
                 it.requestMatchers(HttpMethod.GET, "/meals/suggestions").hasRole(Role.NUTRITIONIST.name)
                 it.requestMatchers(HttpMethod.PATCH, "/meals/suggestions/*").hasRole(Role.NUTRITIONIST.name)
+                it.requestMatchers(HttpMethod.PATCH, "/members/me/school-name").denyAll()
                 // 승인 전(PENDING_NUTRITIONIST) 회원은 그 외 API에 접근할 수 없다.
                 it.anyRequest().hasAnyRole(Role.NUTRITIONIST.name, Role.ADMIN.name)
             }.addFilterBefore(

@@ -10,6 +10,7 @@ import io.mockk.slot
 import io.mockk.verify
 import team.nongchun.hororog.domain.ingredient.dto.CreateIngredientPlanRequest
 import team.nongchun.hororog.domain.ingredient.entity.IngredientPlan
+import team.nongchun.hororog.domain.ingredient.exception.InvalidIngredientPlanException
 import team.nongchun.hororog.domain.ingredient.repository.IngredientPlanRepository
 import team.nongchun.hororog.domain.member.entity.Member
 import team.nongchun.hororog.domain.member.entity.Role
@@ -75,6 +76,23 @@ class CreateIngredientPlanServiceTest :
                     shouldThrow<MemberNotFoundException> {
                         service.execute(request)
                     }
+                }
+            }
+        }
+
+        Given("시작일이 종료일보다 늦은 요청이 주어졌을 때") {
+            val invalidRequest =
+                request.copy(
+                    startDate = LocalDate.of(2026, 7, 1),
+                    endDate = LocalDate.of(2026, 6, 30),
+                )
+
+            When("식자재 계획표를 생성하면") {
+                Then("InvalidIngredientPlanException이 발생하고 저장하지 않는다") {
+                    shouldThrow<InvalidIngredientPlanException> {
+                        service.execute(invalidRequest)
+                    }
+                    verify(exactly = 0) { ingredientPlanRepository.save(any()) }
                 }
             }
         }
