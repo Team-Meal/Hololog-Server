@@ -12,4 +12,6 @@ interface OrderPlanItemRepository : JpaRepository<OrderPlanItem, Long> {
     ): OrderPlanItem?
 
     fun findAllByIngredientId(ingredientId: Long): List<OrderPlanItem>
+
+    fun deleteAllByOrderPlanId(orderPlanId: Long)
 }

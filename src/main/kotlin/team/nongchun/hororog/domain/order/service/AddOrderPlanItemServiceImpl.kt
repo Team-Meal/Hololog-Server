@@ -4,9 +4,8 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import team.nongchun.hororog.domain.ingredient.cache.KamisPriceCacheRepository
 import team.nongchun.hororog.domain.ingredient.exception.IngredientNotFoundException
+import team.nongchun.hororog.domain.ingredient.exception.InvalidQuantityUnitException
 import team.nongchun.hororog.domain.ingredient.repository.IngredientRepository
-import team.nongchun.hororog.domain.member.exception.MemberNotFoundException
-import team.nongchun.hororog.domain.member.repository.MemberRepository
 import team.nongchun.hororog.domain.order.dto.AddOrderPlanItemRequest
 import team.nongchun.hororog.domain.order.dto.OrderPlanItemResponse
 import team.nongchun.hororog.domain.order.entity.OrderPlanItem
@@ -23,18 +22,13 @@ class AddOrderPlanItemServiceImpl(
     private val orderPlanItemRepository: OrderPlanItemRepository,
     private val ingredientRepository: IngredientRepository,
     private val kamisPriceCacheRepository: KamisPriceCacheRepository,
-    private val memberRepository: MemberRepository,
     private val authenticationHolder: AuthenticationHolder,
 ) : AddOrderPlanItemService {
     override fun execute(
         orderPlanId: Long,
         request: AddOrderPlanItemRequest,
     ): OrderPlanItemResponse {
-        val schoolName =
-            memberRepository
-                .findById(authenticationHolder.getCurrentUserId())
-                .orElseThrow { MemberNotFoundException() }
-                .schoolName
+        val schoolName = authenticationHolder.getCurrentUserSchoolName()
 
         val orderPlan =
             orderPlanRepository.findByIdAndMemberSchoolName(orderPlanId, schoolName)
@@ -44,7 +38,7 @@ class AddOrderPlanItemServiceImpl(
             ingredientRepository.findByIdAndMemberSchoolName(request.ingredientId, schoolName)
                 ?: throw IngredientNotFoundException()
 
-        val unit = QuantityUnit.fromOrNull(request.unit) ?: QuantityUnit.KG
+        val unit = QuantityUnit.fromOrNull(request.unit) ?: throw InvalidQuantityUnitException()
         val unitPrice =
             request.unitPrice
                 ?: kamisPriceCacheRepository
@@ -54,7 +48,7 @@ class AddOrderPlanItemServiceImpl(
                     ?.toDouble()
 
         val requiredQuantity = request.perPersonUsage * orderPlan.studentCount
-        val currentStock = ingredient.quantity.toDouble()
+        val currentStock = ingredient.unit.convertTo(unit, ingredient.quantity.toDouble())
         val shortageQuantity = maxOf(requiredQuantity - currentStock, 0.0)
         val orderQuantity = shortageQuantity * 1.05
         val estimatedCost = unitPrice?.let { orderQuantity * it }

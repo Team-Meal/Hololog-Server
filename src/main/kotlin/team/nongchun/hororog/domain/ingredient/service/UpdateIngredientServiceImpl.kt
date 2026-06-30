@@ -7,8 +7,6 @@ import team.nongchun.hororog.domain.ingredient.dto.UpdateIngredientRequest
 import team.nongchun.hororog.domain.ingredient.exception.IngredientNotFoundException
 import team.nongchun.hororog.domain.ingredient.exception.InvalidQuantityUnitException
 import team.nongchun.hororog.domain.ingredient.repository.IngredientRepository
-import team.nongchun.hororog.domain.member.exception.MemberNotFoundException
-import team.nongchun.hororog.domain.member.repository.MemberRepository
 import team.nongchun.hororog.domain.order.repository.OrderPlanItemRepository
 import team.nongchun.hororog.domain.order.service.OrderPlanCalculator
 import team.nongchun.hororog.global.auth.AuthenticationHolder
@@ -19,18 +17,13 @@ import team.nongchun.hororog.global.common.QuantityUnit
 class UpdateIngredientServiceImpl(
     private val ingredientRepository: IngredientRepository,
     private val orderPlanItemRepository: OrderPlanItemRepository,
-    private val memberRepository: MemberRepository,
     private val authenticationHolder: AuthenticationHolder,
 ) : UpdateIngredientService {
     override fun execute(
         ingredientId: Long,
         request: UpdateIngredientRequest,
     ): IngredientUpdateResponse {
-        val schoolName =
-            memberRepository
-                .findById(authenticationHolder.getCurrentUserId())
-                .orElseThrow { MemberNotFoundException() }
-                .schoolName
+        val schoolName = authenticationHolder.getCurrentUserSchoolName()
         val ingredient =
             ingredientRepository.findByIdAndMemberSchoolName(ingredientId, schoolName)
                 ?: throw IngredientNotFoundException()
@@ -45,7 +38,7 @@ class UpdateIngredientServiceImpl(
         request.quantity?.let { newQty ->
             ingredient.quantity = newQty
             orderPlanItemRepository.findAllByIngredientId(ingredient.id).forEach { item ->
-                item.currentStock = newQty.toDouble()
+                item.currentStock = ingredient.unit.convertTo(item.unit, newQty.toDouble())
                 OrderPlanCalculator.recalculateStock(item)
             }
         }

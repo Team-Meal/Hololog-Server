@@ -46,17 +46,15 @@ class OrderPlanController(
 ) {
     @Operation(summary = "발주 계획 생성")
     @ApiResponses(
-        ApiResponse(responseCode = "204", description = "생성 성공"),
+        ApiResponse(responseCode = "201", description = "생성 성공"),
         ApiResponse(responseCode = "400", description = "유효하지 않은 요청 값"),
         ApiResponse(responseCode = "401", description = "인증 실패"),
     )
     @PostMapping
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.CREATED)
     fun create(
         @Valid @RequestBody request: CreateOrderPlanRequest,
-    ) {
-        createOrderPlanService.execute(request)
-    }
+    ): OrderPlanDetailResponse = createOrderPlanService.execute(request)
 
     @Operation(summary = "발주 계획 목록 조회")
     @ApiResponses(

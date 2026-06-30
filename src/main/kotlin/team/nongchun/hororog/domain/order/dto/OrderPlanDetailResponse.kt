@@ -25,7 +25,11 @@ data class OrderPlanDetailResponse(
             planDate = entity.planDate,
             studentCount = entity.studentCount,
             memo = entity.memo,
-            totalEstimatedCost = items.mapNotNull { it.estimatedCost }.sum().takeIf { items.any { i -> i.estimatedCost != null } },
+            totalEstimatedCost =
+                items.mapNotNull { it.estimatedCost }.sum().takeIf {
+                    items.isNotEmpty() &&
+                        items.all { i -> i.estimatedCost != null }
+                },
             items = items,
             createdAt = entity.createdAt,
             updatedAt = entity.updatedAt,

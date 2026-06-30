@@ -2,8 +2,7 @@ package team.nongchun.hororog.domain.order.service
 
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import team.nongchun.hororog.domain.member.exception.MemberNotFoundException
-import team.nongchun.hororog.domain.member.repository.MemberRepository
+import team.nongchun.hororog.domain.ingredient.exception.InvalidQuantityUnitException
 import team.nongchun.hororog.domain.order.dto.OrderPlanItemResponse
 import team.nongchun.hororog.domain.order.dto.UpdateOrderPlanItemRequest
 import team.nongchun.hororog.domain.order.exception.OrderPlanItemNotFoundException
@@ -18,7 +17,6 @@ import team.nongchun.hororog.global.common.QuantityUnit
 class UpdateOrderPlanItemServiceImpl(
     private val orderPlanRepository: OrderPlanRepository,
     private val orderPlanItemRepository: OrderPlanItemRepository,
-    private val memberRepository: MemberRepository,
     private val authenticationHolder: AuthenticationHolder,
 ) : UpdateOrderPlanItemService {
     override fun execute(
@@ -26,11 +24,7 @@ class UpdateOrderPlanItemServiceImpl(
         itemId: Long,
         request: UpdateOrderPlanItemRequest,
     ): OrderPlanItemResponse {
-        val schoolName =
-            memberRepository
-                .findById(authenticationHolder.getCurrentUserId())
-                .orElseThrow { MemberNotFoundException() }
-                .schoolName
+        val schoolName = authenticationHolder.getCurrentUserSchoolName()
 
         val orderPlan =
             orderPlanRepository.findByIdAndMemberSchoolName(orderPlanId, schoolName)
@@ -41,7 +35,9 @@ class UpdateOrderPlanItemServiceImpl(
                 ?: throw OrderPlanItemNotFoundException()
 
         request.menuName?.let { item.menuName = it }
-        request.unit?.let { QuantityUnit.fromOrNull(it)?.let { u -> item.unit = u } }
+        request.unit?.let {
+            item.unit = QuantityUnit.fromOrNull(it) ?: throw InvalidQuantityUnitException()
+        }
         request.supplierName?.let { item.supplierName = it }
         request.unitPrice?.let { item.unitPrice = it }
 
@@ -54,6 +50,6 @@ class UpdateOrderPlanItemServiceImpl(
             }
         }
 
-        return OrderPlanItemResponse.from(orderPlanItemRepository.saveAndFlush(item))
+        return OrderPlanItemResponse.from(item)
     }
 }
