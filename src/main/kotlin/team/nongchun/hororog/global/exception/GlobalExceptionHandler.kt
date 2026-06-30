@@ -30,6 +30,8 @@ import team.nongchun.hororog.domain.member.exception.MemberNotFoundException
 import team.nongchun.hororog.domain.member.exception.SignupRequestAlreadyPendingException
 import team.nongchun.hororog.domain.member.exception.SignupRequestAlreadyProcessedException
 import team.nongchun.hororog.domain.member.exception.SignupRequestNotFoundException
+import team.nongchun.hororog.domain.order.exception.OrderPlanItemNotFoundException
+import team.nongchun.hororog.domain.order.exception.OrderPlanNotFoundException
 import team.nongchun.hororog.domain.supplier.exception.SupplierNotFoundException
 import tools.jackson.core.JacksonException
 
@@ -166,6 +168,18 @@ class GlobalExceptionHandler {
     @ExceptionHandler(SupplierNotFoundException::class)
     fun handleSupplierNotFound(e: SupplierNotFoundException): ResponseEntity<ErrorResponse> {
         logger.info("공급처 조회 실패: {}", e.message)
+        return toResponse(HttpStatus.NOT_FOUND, e.message)
+    }
+
+    @ExceptionHandler(OrderPlanNotFoundException::class)
+    fun handleOrderPlanNotFound(e: OrderPlanNotFoundException): ResponseEntity<ErrorResponse> {
+        logger.info("발주 계획 조회 실패: {}", e.message)
+        return toResponse(HttpStatus.NOT_FOUND, e.message)
+    }
+
+    @ExceptionHandler(OrderPlanItemNotFoundException::class)
+    fun handleOrderPlanItemNotFound(e: OrderPlanItemNotFoundException): ResponseEntity<ErrorResponse> {
+        logger.info("발주 계획 항목 조회 실패: {}", e.message)
         return toResponse(HttpStatus.NOT_FOUND, e.message)
     }
 
