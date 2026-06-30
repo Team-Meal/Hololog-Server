@@ -102,11 +102,11 @@ jobs:
 
       - name: Pull latest image
         if: steps.check_env.outputs.ready == 'true'
-        run: APP_IMAGE=${{ steps.img.outputs.image }} docker compose -f docker-compose.prod.yml pull app
+        run: APP_IMAGE=${{ steps.img.outputs.image }} docker compose --env-file /opt/hololog/.env -f docker-compose.prod.yml pull app
 
       - name: Deploy
         if: steps.check_env.outputs.ready == 'true'
-        run: APP_IMAGE=${{ steps.img.outputs.image }} docker compose -f docker-compose.prod.yml up -d
+        run: APP_IMAGE=${{ steps.img.outputs.image }} docker compose --env-file /opt/hololog/.env -f docker-compose.prod.yml up -d
 
       - name: Verify deployment
         if: steps.check_env.outputs.ready == 'true'
