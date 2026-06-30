@@ -1,6 +1,7 @@
 package team.nongchun.hororog.domain.ingredient.dto
 
 import team.nongchun.hororog.domain.ingredient.cache.KamisPriceCache
+import kotlin.math.roundToInt
 
 data class IngredientPriceResponse(
     val itemName: String,
@@ -43,7 +44,7 @@ data class IngredientPriceResponse(
                 unit = cache.unit,
                 baseDate = cache.baseDate,
                 previousPricePerKg = cache.previousPricePerKg,
-                priceChangeRate = changeRate?.let { Math.round(it * 10) / 10.0 },
+                priceChangeRate = changeRate?.let { (it * 10).roundToInt() / 10.0 },
                 isPriceSurge = isSurge,
                 alternatives = if (isSurge) ALTERNATIVES_MAP[cache.itemName] ?: emptyList() else emptyList(),
             )
