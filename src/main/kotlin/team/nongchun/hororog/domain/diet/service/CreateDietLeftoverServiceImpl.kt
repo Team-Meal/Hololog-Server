@@ -24,15 +24,19 @@ class CreateDietLeftoverServiceImpl(
             dietRepository.findByIdAndMemberSchoolName(dietId, authenticationHolder.getCurrentUserSchoolName())
                 ?: throw DietNotFoundException()
         val leftover =
-            leftoverRepository.findByDietId(diet.id) ?: Leftover(
-                diet = diet,
-                amount = request.amount,
-                unit = request.unit,
-                memo = request.memo,
-            )
-        leftover.amount = request.amount
-        leftover.unit = request.unit
-        leftover.memo = request.memo
+            leftoverRepository
+                .findByDietId(diet.id)
+                ?.apply {
+                    amount = request.amount
+                    unit = request.unit
+                    memo = request.memo
+                }
+                ?: Leftover(
+                    diet = diet,
+                    amount = request.amount,
+                    unit = request.unit,
+                    memo = request.memo,
+                )
         leftoverRepository.save(leftover)
     }
 }
