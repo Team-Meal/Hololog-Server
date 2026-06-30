@@ -8,7 +8,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
-import team.nongchun.hororog.domain.member.dto.CreateSignupRequestRequest
+import team.nongchun.hororog.domain.member.dto.CreateSignupRequest
 import team.nongchun.hororog.domain.member.entity.Member
 import team.nongchun.hororog.domain.member.entity.NutritionistSignupRequest
 import team.nongchun.hororog.domain.member.entity.Role
@@ -30,7 +30,7 @@ class CreateSignupRequestServiceTest :
         val service =
             CreateSignupRequestServiceImpl(memberRepository, signupRequestRepository, authenticationHolder)
 
-        val request = CreateSignupRequestRequest(licenseNumber = "123456789")
+        val request = CreateSignupRequest(licenseNumber = "123456789")
         val member =
             Member(
                 id = 1L,

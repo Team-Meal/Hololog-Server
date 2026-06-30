@@ -1,3 +1,3 @@
-package team.nongchun.hororog.domain.ingredient.exception
+package team.nongchun.hororog.global.exception
 
 class InvalidQuantityUnitException : RuntimeException("올바르지 않은 단위입니다.")

@@ -5,12 +5,12 @@ import org.springframework.transaction.annotation.Transactional
 import team.nongchun.hororog.domain.ingredient.dto.IngredientUpdateResponse
 import team.nongchun.hororog.domain.ingredient.dto.UpdateIngredientRequest
 import team.nongchun.hororog.domain.ingredient.exception.IngredientNotFoundException
-import team.nongchun.hororog.domain.ingredient.exception.InvalidQuantityUnitException
 import team.nongchun.hororog.domain.ingredient.repository.IngredientRepository
 import team.nongchun.hororog.domain.order.repository.OrderPlanItemRepository
 import team.nongchun.hororog.domain.order.service.OrderPlanCalculator
 import team.nongchun.hororog.global.auth.AuthenticationHolder
 import team.nongchun.hororog.global.common.QuantityUnit
+import team.nongchun.hororog.global.exception.InvalidQuantityUnitException
 
 @Service
 @Transactional

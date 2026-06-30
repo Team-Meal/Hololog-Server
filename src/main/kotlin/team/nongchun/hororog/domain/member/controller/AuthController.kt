@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
-import team.nongchun.hororog.domain.member.dto.CreateSignupRequestRequest
+import team.nongchun.hororog.domain.member.dto.CreateSignupRequest
 import team.nongchun.hororog.domain.member.dto.SigninRequest
 import team.nongchun.hororog.domain.member.dto.SigninResponse
 import team.nongchun.hororog.domain.member.dto.SignupRequest
@@ -95,6 +95,6 @@ class AuthController(
     @PostMapping("/signup-requests")
     @ResponseStatus(HttpStatus.CREATED)
     fun createSignupRequest(
-        @Valid @RequestBody request: CreateSignupRequestRequest,
+        @Valid @RequestBody request: CreateSignupRequest,
     ): SignupRequestResponse = createSignupRequestService.execute(request)
 }

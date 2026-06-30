@@ -15,7 +15,7 @@ import team.nongchun.hororog.domain.diet.exception.DietNotFoundException
 import team.nongchun.hororog.domain.ingredient.exception.IngredientNotFoundException
 import team.nongchun.hororog.domain.ingredient.exception.IngredientPlanNotFoundException
 import team.nongchun.hororog.domain.ingredient.exception.InvalidIngredientPlanException
-import team.nongchun.hororog.domain.ingredient.exception.InvalidQuantityUnitException
+import team.nongchun.hororog.domain.leftover.exception.LeftoverNotFoundException
 import team.nongchun.hororog.domain.meal.exception.AiMealGenerationAlreadyInProgressException
 import team.nongchun.hororog.domain.meal.exception.AiMealGenerationAlreadySucceededException
 import team.nongchun.hororog.domain.meal.exception.InvalidMealSuggestionStatusException
@@ -33,6 +33,7 @@ import team.nongchun.hororog.domain.member.exception.SignupRequestNotFoundExcept
 import team.nongchun.hororog.domain.order.exception.OrderPlanItemNotFoundException
 import team.nongchun.hororog.domain.order.exception.OrderPlanNotFoundException
 import team.nongchun.hororog.domain.supplier.exception.SupplierNotFoundException
+import team.nongchun.hororog.global.exception.InvalidQuantityUnitException
 import tools.jackson.core.JacksonException
 
 @RestControllerAdvice
@@ -54,6 +55,12 @@ class GlobalExceptionHandler {
     @ExceptionHandler(DietNotFoundException::class)
     fun handleDietNotFound(e: DietNotFoundException): ResponseEntity<ErrorResponse> {
         logger.info("식단 조회 실패: {}", e.message)
+        return toResponse(HttpStatus.NOT_FOUND, e.message)
+    }
+
+    @ExceptionHandler(LeftoverNotFoundException::class)
+    fun handleLeftoverNotFound(e: LeftoverNotFoundException): ResponseEntity<ErrorResponse> {
+        logger.info("잔반 조회 실패: {}", e.message)
         return toResponse(HttpStatus.NOT_FOUND, e.message)
     }
 

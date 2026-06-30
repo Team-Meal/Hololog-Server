@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Transactional
 import team.nongchun.hororog.domain.diet.dto.DietLeftoverResponse
 import team.nongchun.hororog.domain.diet.exception.DietNotFoundException
 import team.nongchun.hororog.domain.diet.repository.DietRepository
+import team.nongchun.hororog.domain.leftover.exception.LeftoverNotFoundException
 import team.nongchun.hororog.domain.leftover.repository.LeftoverRepository
 import team.nongchun.hororog.global.auth.AuthenticationHolder
 
@@ -21,7 +22,7 @@ class GetDietLeftoverServiceImpl(
                 ?: throw DietNotFoundException()
         val leftover =
             leftoverRepository.findByDietId(diet.id)
-                ?: throw DietNotFoundException()
+                ?: throw LeftoverNotFoundException()
         return DietLeftoverResponse.from(leftover)
     }
 }

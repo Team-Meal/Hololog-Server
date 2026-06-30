@@ -4,9 +4,8 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
-import jakarta.validation.ConstraintViolationException
 import jakarta.validation.Valid
-import jakarta.validation.Validator
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
@@ -36,8 +36,6 @@ import team.nongchun.hororog.domain.diet.service.GetDietService
 import team.nongchun.hororog.domain.diet.service.UpdateDietService
 import team.nongchun.hororog.domain.meal.dto.CreateAiMealSlotRequest
 import team.nongchun.hororog.domain.meal.service.CreateAiMealSlotService
-import tools.jackson.databind.JsonNode
-import tools.jackson.databind.ObjectMapper
 
 @Tag(name = "Diet", description = "식단 API")
 @RestController
@@ -52,36 +50,40 @@ class DietController(
     private val getDietLeftoverService: GetDietLeftoverService,
     private val exportDietService: ExportDietService,
     private val createAiMealSlotService: CreateAiMealSlotService,
-    private val objectMapper: ObjectMapper,
-    private val validator: Validator,
+    @Value("\${internal.api-key}") private val internalApiKey: String,
 ) {
-    @Operation(
-        summary = "식단 작성",
-        description =
-            "meal_type 필드가 있으면 AI 서버 콜백(급식 슬롯 생성)으로 처리합니다. " +
-                "Hololog-AI 서버의 콜백 경로가 /diets로 고정돼 있어 같은 경로를 공유한다.",
-    )
+    @Operation(summary = "식단 작성")
     @ApiResponses(
         ApiResponse(responseCode = "204", description = "식단 작성 성공"),
-        ApiResponse(responseCode = "201", description = "AI 콜백 — 급식 슬롯 생성 성공"),
         ApiResponse(responseCode = "400", description = "유효하지 않은 요청 값"),
         ApiResponse(responseCode = "401", description = "인증 실패"),
     )
     @PostMapping
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     fun createDiet(
-        @RequestBody body: JsonNode,
-    ): ResponseEntity<Any> =
-        if (body.has("meal_type")) {
-            val request = objectMapper.treeToValue(body, CreateAiMealSlotRequest::class.java)
-            val mealId = createAiMealSlotService.execute(request)
-            ResponseEntity.status(HttpStatus.CREATED).body(mapOf("id" to mealId))
-        } else {
-            val request = objectMapper.treeToValue(body, CreateDietRequest::class.java)
-            val violations = validator.validate(request)
-            if (violations.isNotEmpty()) throw ConstraintViolationException(violations)
-            createDietService.execute(request)
-            ResponseEntity.noContent().build()
-        }
+        @Valid @RequestBody request: CreateDietRequest,
+    ) {
+        createDietService.execute(request)
+    }
+
+    @Operation(
+        summary = "AI 서버 콜백 — 급식 슬롯 생성",
+        description = "AI 서버가 식단 생성을 완료한 뒤 호출하는 전용 콜백 엔드포인트. X-Internal-Token 헤더 인증 필요.",
+    )
+    @ApiResponses(
+        ApiResponse(responseCode = "201", description = "급식 슬롯 생성 성공"),
+        ApiResponse(responseCode = "400", description = "유효하지 않은 요청 값"),
+        ApiResponse(responseCode = "401", description = "내부 인증 실패"),
+    )
+    @PostMapping("/ai-callback")
+    fun createAiMealSlot(
+        @RequestHeader("X-Internal-Token") token: String,
+        @Valid @RequestBody request: CreateAiMealSlotRequest,
+    ): ResponseEntity<Map<String, Long>> {
+        if (token != internalApiKey) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
+        val mealId = createAiMealSlotService.execute(request)
+        return ResponseEntity.status(HttpStatus.CREATED).body(mapOf("id" to mealId))
+    }
 
     @Operation(summary = "식단 목록 조회")
     @ApiResponses(

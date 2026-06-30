@@ -2,6 +2,7 @@ package team.nongchun.hororog.domain.budget.dto
 
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 import java.time.LocalDate
 
@@ -10,9 +11,11 @@ data class CreateBudgetRequest(
     @field:Size(max = 100)
     val title: String,
     @field:Min(0)
-    val totalAmount: Int,
+    val totalAmount: Long,
     @field:Min(0)
-    val usedAmount: Int,
+    val usedAmount: Long,
+    @field:NotNull
     val startDate: LocalDate,
+    @field:NotNull
     val endDate: LocalDate,
 )
