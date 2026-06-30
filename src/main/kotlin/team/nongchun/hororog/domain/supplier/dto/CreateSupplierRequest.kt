@@ -7,5 +7,6 @@ data class CreateSupplierRequest(
     @field:NotBlank
     @field:Size(max = 100)
     val name: String,
+    @field:Size(max = 500)
     val contactInfo: String? = null,
 )

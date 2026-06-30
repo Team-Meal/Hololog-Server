@@ -34,17 +34,15 @@ class SupplierController(
 ) {
     @Operation(summary = "공급처 등록")
     @ApiResponses(
-        ApiResponse(responseCode = "204", description = "등록 성공"),
+        ApiResponse(responseCode = "201", description = "등록 성공"),
         ApiResponse(responseCode = "400", description = "유효하지 않은 요청 값"),
         ApiResponse(responseCode = "401", description = "인증 실패"),
     )
     @PostMapping
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.CREATED)
     fun create(
         @Valid @RequestBody request: CreateSupplierRequest,
-    ) {
-        createSupplierService.execute(request)
-    }
+    ): SupplierResponse = createSupplierService.execute(request)
 
     @Operation(summary = "공급처 목록 조회")
     @ApiResponses(
