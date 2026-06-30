@@ -7,8 +7,8 @@ import java.time.LocalDateTime
 data class BudgetResponse(
     val id: Long,
     val title: String,
-    val totalAmount: Int,
-    val usedAmount: Int,
+    val totalAmount: Long,
+    val usedAmount: Long,
     val startDate: LocalDate,
     val endDate: LocalDate,
     val createdAt: LocalDateTime,

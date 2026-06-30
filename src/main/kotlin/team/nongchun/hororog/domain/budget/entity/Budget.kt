@@ -25,9 +25,9 @@ class Budget(
     @Column(nullable = false, length = 100)
     var name: String,
     @Column(nullable = false)
-    var totalBudget: Int,
+    var totalBudget: Long,
     @Column(nullable = false)
-    var usedBudget: Int,
+    var usedBudget: Long,
     @Column(nullable = false)
     var startDate: LocalDate,
     @Column(nullable = false)
