@@ -12,33 +12,29 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @Service
-class KamisPriceServiceImpl(
+class SyncKamisPriceService(
     private val kamisClient: KamisClient,
     private val kamisPriceCacheRepository: KamisPriceCacheRepository,
     private val kamisProperties: KamisProperties,
     private val objectMapper: ObjectMapper,
-) : KamisPriceService {
+) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
     companion object {
-        private val TARGET_ITEMS = setOf("감자", "양파", "당근", "오이", "토마토", "수박", "배추", "무", "고구마", "파")
-        private val CATEGORY_CODES = listOf("200", "400", "100")
+        val TARGET_ITEMS = setOf("감자", "양파", "당근", "오이", "토마토", "수박", "배추", "무", "고구마", "파")
         private val DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy/MM/dd")
     }
 
-    override fun getPrices(): List<IngredientPriceResponse> {
-        val cached = kamisPriceCacheRepository.findAll().toList()
-        if (cached.isNotEmpty()) {
-            return cached.map { IngredientPriceResponse.from(it) }
-        }
-        return syncPrices()
-    }
-
-    override fun syncPrices(): List<IngredientPriceResponse> {
-        val regDay = resolveRegDay()
+    fun execute(): List<IngredientPriceResponse> {
+        val (regDay, raw200) = resolveRegDay()
         val items = mutableListOf<KamisPriceCache>()
 
-        for (categoryCode in CATEGORY_CODES) {
+        // categoryCode 200은 resolveRegDay()에서 이미 조회함 — 재활용
+        if (raw200 != null) {
+            items += parseItems(raw200, regDay)
+        }
+
+        for (categoryCode in listOf("400", "100")) {
             try {
                 val raw =
                     kamisClient.getDailyPriceByCategory(
@@ -57,19 +53,17 @@ class KamisPriceServiceImpl(
             }
         }
 
-        if (items.isNotEmpty()) {
+        if (items.size >= TARGET_ITEMS.size) {
             kamisPriceCacheRepository.saveAll(items)
         } else {
-            logger.info("KAMIS 조회 결과 없음 (regDay=$regDay)")
+            logger.warn("KAMIS 조회 품목 부족 (${items.size}/${TARGET_ITEMS.size}), 캐시 저장 건너뜀")
         }
         return items.map { IngredientPriceResponse.from(it) }
     }
 
-    override fun getPriceAlerts(): List<IngredientPriceResponse> = getPrices().filter { it.isPriceSurge }
-
-    // 오늘 날짜로 조회 → 없으면 어제로 fallback
-    private fun resolveRegDay(): String {
+    private fun resolveRegDay(): Pair<String, String?> {
         val today = LocalDate.now().format(DATE_FORMATTER)
+        val yesterday = LocalDate.now().minusDays(1).format(DATE_FORMATTER)
         return try {
             val raw =
                 kamisClient.getDailyPriceByCategory(
@@ -82,9 +76,9 @@ class KamisPriceServiceImpl(
                     regDay = today,
                     convertKgYn = "Y",
                 )
-            if (hasData(raw)) today else LocalDate.now().minusDays(1).format(DATE_FORMATTER)
+            if (hasData(raw)) Pair(today, raw) else Pair(yesterday, null)
         } catch (e: Exception) {
-            LocalDate.now().minusDays(1).format(DATE_FORMATTER)
+            Pair(yesterday, null)
         }
     }
 
@@ -114,7 +108,7 @@ class KamisPriceServiceImpl(
             .filter { TARGET_ITEMS.contains(it.get("productName")?.asText()) }
             .groupBy { it.get("productName")?.asText() }
             .forEach { (name, list) ->
-                val item = list.first()
+                val item = list.find { it.get("gradeName")?.asText() == "상" } ?: list.first()
                 val current =
                     item
                         .get("dpr1")
