@@ -1,5 +1,7 @@
 package team.nongchun.hororog.global.common
 
+import team.nongchun.hororog.global.exception.InvalidQuantityUnitException
+
 enum class QuantityUnit {
     KG,
     G,
@@ -19,7 +21,7 @@ enum class QuantityUnit {
             this == G && target == KG -> value / 1000
             this == L && target == ML -> value * 1000
             this == ML && target == L -> value / 1000
-            else -> value
+            else -> throw InvalidQuantityUnitException()
         }
     }
 

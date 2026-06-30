@@ -2,7 +2,6 @@ package team.nongchun.hororog.domain.order.service
 
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import team.nongchun.hororog.domain.ingredient.exception.InvalidQuantityUnitException
 import team.nongchun.hororog.domain.order.dto.OrderPlanItemResponse
 import team.nongchun.hororog.domain.order.dto.UpdateOrderPlanItemRequest
 import team.nongchun.hororog.domain.order.exception.OrderPlanItemNotFoundException
@@ -11,6 +10,7 @@ import team.nongchun.hororog.domain.order.repository.OrderPlanItemRepository
 import team.nongchun.hororog.domain.order.repository.OrderPlanRepository
 import team.nongchun.hororog.global.auth.AuthenticationHolder
 import team.nongchun.hororog.global.common.QuantityUnit
+import team.nongchun.hororog.global.exception.InvalidQuantityUnitException
 
 @Service
 @Transactional
