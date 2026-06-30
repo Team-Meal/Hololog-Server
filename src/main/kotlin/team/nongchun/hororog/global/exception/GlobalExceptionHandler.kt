@@ -30,6 +30,7 @@ import team.nongchun.hororog.domain.member.exception.MemberNotFoundException
 import team.nongchun.hororog.domain.member.exception.SignupRequestAlreadyPendingException
 import team.nongchun.hororog.domain.member.exception.SignupRequestAlreadyProcessedException
 import team.nongchun.hororog.domain.member.exception.SignupRequestNotFoundException
+import team.nongchun.hororog.domain.supplier.exception.SupplierNotFoundException
 import tools.jackson.core.JacksonException
 
 @RestControllerAdvice
@@ -160,6 +161,12 @@ class GlobalExceptionHandler {
     fun handleAiMealGenerationAlreadySucceeded(e: AiMealGenerationAlreadySucceededException): ResponseEntity<ErrorResponse> {
         logger.info("AI 식단 생성 재생성 요청: {}", e.message)
         return toResponse(HttpStatus.CONFLICT, e.message)
+    }
+
+    @ExceptionHandler(SupplierNotFoundException::class)
+    fun handleSupplierNotFound(e: SupplierNotFoundException): ResponseEntity<ErrorResponse> {
+        logger.info("공급처 조회 실패: {}", e.message)
+        return toResponse(HttpStatus.NOT_FOUND, e.message)
     }
 
     @ExceptionHandler(ConstraintViolationException::class)
