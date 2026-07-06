@@ -150,7 +150,7 @@ class AuthControllerTest
         }
 
         @Test
-        fun `NUTRITIONIST 권한으로 요청하면 400을 반환한다`() {
+        fun `NUTRITIONIST 권한으로 요청하면 204를 반환하고 NUTRITIONIST 회원을 저장한다`() {
             val body =
                 """
                 {
@@ -167,10 +167,12 @@ class AuthControllerTest
                     contentType = MediaType.APPLICATION_JSON
                     content = body
                 }.andExpect {
-                    status { isBadRequest() }
+                    status { isNoContent() }
                 }
 
-            assertEquals(0, memberRepository.findAll().size)
+            val saved = memberRepository.findAll()
+            assertEquals(1, saved.size)
+            assertEquals(Role.NUTRITIONIST, saved.first().role)
         }
 
         @Test

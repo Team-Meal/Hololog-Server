@@ -35,6 +35,6 @@ class SignupServiceImpl(
     }
 
     companion object {
-        private val ALLOWED_SIGNUP_ROLES = setOf(Role.STUDENT, Role.TEACHER, Role.PENDING_NUTRITIONIST)
+        private val ALLOWED_SIGNUP_ROLES = setOf(Role.STUDENT, Role.TEACHER, Role.PENDING_NUTRITIONIST, Role.NUTRITIONIST)
     }
 }

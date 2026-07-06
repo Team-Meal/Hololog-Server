@@ -95,13 +95,17 @@ class SignupServiceTest :
 
         Given("NUTRITIONIST 권한으로 회원가입을 시도할 때") {
             val nutritionistRequest = request.copy(role = Role.NUTRITIONIST)
+            every { memberRepository.existsByEmail(nutritionistRequest.email) } returns false
+            every { passwordEncoder.encode(nutritionistRequest.password) } returns "encoded-password"
+            val savedSlot = slot<Member>()
+            every { memberRepository.save(capture(savedSlot)) } answers { savedSlot.captured }
 
             When("회원가입을 실행하면") {
-                Then("InvalidSignupRoleException이 발생한다") {
-                    shouldThrow<InvalidSignupRoleException> {
-                        signupService.execute(nutritionistRequest)
-                    }
-                    verify(exactly = 0) { memberRepository.save(any()) }
+                signupService.execute(nutritionistRequest)
+
+                Then("NUTRITIONIST 역할의 회원이 저장된다") {
+                    verify(exactly = 1) { memberRepository.save(any()) }
+                    savedSlot.captured.role shouldBe Role.NUTRITIONIST
                 }
             }
         }
