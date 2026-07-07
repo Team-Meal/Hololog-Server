@@ -16,6 +16,8 @@ import team.nongchun.hororog.domain.diet.entity.Diet
 import team.nongchun.hororog.domain.diet.repository.DietRepository
 import team.nongchun.hororog.domain.leftover.entity.Leftover
 import team.nongchun.hororog.domain.leftover.repository.LeftoverRepository
+import team.nongchun.hororog.domain.meal.entity.MealType
+import team.nongchun.hororog.domain.meal.repository.MealRepository
 import team.nongchun.hororog.domain.member.entity.Member
 import team.nongchun.hororog.domain.member.entity.Role
 import team.nongchun.hororog.domain.member.repository.MemberRepository
@@ -35,6 +37,7 @@ class DietControllerTest
         private val memberRepository: MemberRepository,
         private val dietRepository: DietRepository,
         private val leftoverRepository: LeftoverRepository,
+        private val mealRepository: MealRepository,
         private val passwordEncoder: PasswordEncoder,
         private val jwtProvider: JwtProvider,
     ) {
@@ -67,6 +70,56 @@ class DietControllerTest
         )
 
         private fun accessToken(member: Member) = jwtProvider.createAccessToken(member.id, member.role)
+
+        @Test
+        fun `AI 콜백은 내부 토큰만으로 급식 슬롯을 생성한다`() {
+            val member = saveMember("nutritionist@hororog.team")
+
+            mockMvc
+                .post("/diets/ai-callback") {
+                    header("X-Internal-Token", "test-internal-key")
+                    contentType = MediaType.APPLICATION_JSON
+                    content =
+                        """
+                        {
+                          "date": "2026-06-29",
+                          "meal_type": "LUNCH",
+                          "school_id": ${member.id}
+                        }
+                        """.trimIndent()
+                }.andExpect {
+                    status { isCreated() }
+                }
+
+            val meals = mealRepository.findAll()
+            assertEquals(1, meals.size)
+            assertEquals(member.id, meals[0].member.id)
+            assertEquals("", meals[0].name)
+            assertEquals(MealType.LUNCH, meals[0].mealType)
+        }
+
+        @Test
+        fun `AI 콜백 내부 토큰이 틀리면 401을 반환한다`() {
+            val member = saveMember("nutritionist@hororog.team")
+
+            mockMvc
+                .post("/diets/ai-callback") {
+                    header("X-Internal-Token", "wrong-token")
+                    contentType = MediaType.APPLICATION_JSON
+                    content =
+                        """
+                        {
+                          "date": "2026-06-29",
+                          "meal_type": "LUNCH",
+                          "school_id": ${member.id}
+                        }
+                        """.trimIndent()
+                }.andExpect {
+                    status { isUnauthorized() }
+                }
+
+            assertEquals(0, mealRepository.findAll().size)
+        }
 
         @Test
         fun `식단 목록은 같은 학교 식단만 반환한다`() {
