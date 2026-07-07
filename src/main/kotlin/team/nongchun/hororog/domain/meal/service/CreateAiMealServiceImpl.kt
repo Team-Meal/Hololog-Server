@@ -5,8 +5,6 @@ import org.springframework.transaction.annotation.Transactional
 import team.nongchun.hororog.domain.meal.dto.CreateAiMealRequest
 import team.nongchun.hororog.domain.meal.exception.MealNotFoundException
 import team.nongchun.hororog.domain.meal.repository.MealRepository
-import team.nongchun.hororog.domain.member.exception.MemberNotFoundException
-import team.nongchun.hororog.domain.member.repository.MemberRepository
 import team.nongchun.hororog.global.auth.AuthenticationHolder
 import tools.jackson.databind.ObjectMapper
 import kotlin.math.roundToInt
@@ -15,19 +13,14 @@ import kotlin.math.roundToInt
 @Transactional
 class CreateAiMealServiceImpl(
     private val mealRepository: MealRepository,
-    private val memberRepository: MemberRepository,
     private val authenticationHolder: AuthenticationHolder,
     private val objectMapper: ObjectMapper,
 ) : CreateAiMealService {
     override fun execute(request: CreateAiMealRequest): Long {
-        val schoolName =
-            memberRepository
-                .findById(authenticationHolder.getCurrentUserId())
-                .orElseThrow { MemberNotFoundException() }
-                .schoolName
+        val schoolName = authenticationHolder.getCurrentUserSchoolName()
         val meal =
-            mealRepository.findById(request.dietId).orElseThrow { MealNotFoundException() }
-        if (meal.member.schoolName != schoolName) throw MealNotFoundException()
+            mealRepository.findByIdAndMemberSchoolName(request.dietId, schoolName)
+                ?: throw MealNotFoundException()
 
         meal.name = request.menuName
         meal.totalCalories = request.kcal.roundToInt()
