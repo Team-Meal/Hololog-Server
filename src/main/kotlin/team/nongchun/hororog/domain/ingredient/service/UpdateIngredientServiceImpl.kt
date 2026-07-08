@@ -34,6 +34,8 @@ class UpdateIngredientServiceImpl(
         }
         request.expirationDate?.let { ingredient.expirationDate = it }
         request.category?.let { ingredient.category = it }
+        request.origin?.let { ingredient.origin = it }
+        request.supplier?.let { ingredient.supplier = it }
 
         request.quantity?.let { newQty ->
             ingredient.quantity = newQty

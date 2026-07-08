@@ -10,6 +10,8 @@ data class IngredientListResponse(
     val unit: String,
     val expirationDate: LocalDateTime,
     val category: String,
+    val origin: String?,
+    val supplier: String?,
 ) {
     companion object {
         fun from(entity: Ingredient) =
@@ -20,6 +22,8 @@ data class IngredientListResponse(
                 unit = entity.unit.name,
                 expirationDate = entity.expirationDate,
                 category = entity.category,
+                origin = entity.origin,
+                supplier = entity.supplier,
             )
     }
 }
