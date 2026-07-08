@@ -13,4 +13,8 @@ data class UpdateIngredientRequest(
     val expirationDate: LocalDateTime? = null,
     @field:Size(max = 50)
     val category: String? = null,
+    @field:Size(max = 100)
+    val origin: String? = null,
+    @field:Size(max = 100)
+    val supplier: String? = null,
 )

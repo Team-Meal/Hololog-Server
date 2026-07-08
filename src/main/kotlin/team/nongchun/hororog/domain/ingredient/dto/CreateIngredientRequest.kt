@@ -17,4 +17,8 @@ data class CreateIngredientRequest(
     @field:NotBlank
     @field:Size(max = 50)
     val category: String,
+    @field:Size(max = 100)
+    val origin: String? = null,
+    @field:Size(max = 100)
+    val supplier: String? = null,
 )

@@ -10,6 +10,8 @@ data class IngredientUpdateResponse(
     val unit: String,
     val expirationDate: LocalDateTime,
     val category: String,
+    val origin: String?,
+    val supplier: String?,
     val updatedAt: LocalDateTime,
 ) {
     companion object {
@@ -21,6 +23,8 @@ data class IngredientUpdateResponse(
                 unit = entity.unit.name,
                 expirationDate = entity.expirationDate,
                 category = entity.category,
+                origin = entity.origin,
+                supplier = entity.supplier,
                 updatedAt = entity.updatedAt,
             )
     }

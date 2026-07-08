@@ -34,6 +34,8 @@ class CreateIngredientServiceImpl(
                 unit = unit,
                 expirationDate = request.expirationDate,
                 category = request.category,
+                origin = request.origin,
+                supplier = request.supplier,
             ),
         )
     }
