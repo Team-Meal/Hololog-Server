@@ -36,4 +36,8 @@ class Ingredient(
     var expirationDate: LocalDateTime,
     @Column(nullable = false, length = 50)
     var category: String,
+    @Column(length = 100)
+    var origin: String? = null,
+    @Column(length = 100)
+    var supplier: String? = null,
 ) : BaseEntity()
